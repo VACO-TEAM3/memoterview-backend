@@ -51,7 +51,7 @@ const intervieweeSchema = new mongoose.Schema({
   },
   filterScores: {
     type: [{
-      type: number,
+      type: Number,
     }],
     default: [],
   },
