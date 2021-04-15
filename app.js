@@ -1,3 +1,7 @@
+require("dotenv").config();
+
+require("./loader/db");
+
 const createError = require("http-errors");
 const express = require("express");
 const cookieParser = require("cookie-parser");
