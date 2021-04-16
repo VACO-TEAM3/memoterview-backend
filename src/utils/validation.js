@@ -1,6 +1,6 @@
 const Joi = require("joi");
 
-function validateLoginData(data) {
+exports.validateLoginData = data => {
   const schema = Joi.object({
     email: Joi.string().email({ minDomainSegments: 2 }).required(),
     imageUrl: Joi.string().required(),
@@ -8,6 +8,4 @@ function validateLoginData(data) {
   });
 
   return schema.validate({ ...data });
-}
-
-module.exports.validateLoginData = validateLoginData;
+};
