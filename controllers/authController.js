@@ -5,7 +5,6 @@ const { validateLoginData } = require("../utils/validateLoginData");
 exports.getLogin = async function (req, res, next) {
   try {
     const user = req.body;
-
     const { value, error } = validateLoginData(user);
 
     if (error) {
@@ -27,6 +26,7 @@ exports.getLogin = async function (req, res, next) {
       });
 
       accessToken = await signAccessToken(newInterviewer);
+
       return res.json({
         "result": "ok",
         "data": {
@@ -43,17 +43,18 @@ exports.getLogin = async function (req, res, next) {
     }
 
     accessToken = await signAccessToken(interviewer);
+
     return res.json({
-      "result": "ok",
-      "data": {
-        "user": {
-          "email": interviewer.email,
-          "avatar": interviewer.avatar,
-          "username": interviewer.username,
-          "myProjects": interviewer.myProjects,
-          "joinedProjects": interviewer.joinedProjects,
+      result: "ok",
+      data: {
+        user: {
+          email: interviewer.email,
+          avatar: interviewer.avatar,
+          username: interviewer.username,
+          myProjects: interviewer.myProjects,
+          joinedProjects: interviewer.joinedProjects,
         },
-        "token": accessToken,
+        token: accessToken,
       },
     });
   } catch (error) {

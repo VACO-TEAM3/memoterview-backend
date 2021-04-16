@@ -12,14 +12,14 @@ const interviewerSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  myProject: {
+  myProjects: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Project",
     }],
     default: [],
   },
-  joinedProject: {
+  joinedProjects: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Project",
