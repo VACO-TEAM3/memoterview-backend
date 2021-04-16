@@ -28,14 +28,14 @@ exports.getLogin = async function (req, res, next) {
       accessToken = await signAccessToken(newInterviewer);
 
       return res.json({
-        "result": "ok",
-        "data": {
-          "user": {
-            "email": newInterviewer.email,
-            "avatar": newInterviewer.avatar,
-            "username": newInterviewer.username,
-            "myProjects": newInterviewer.myProjects,
-            "joinedProjects": newInterviewer.joinedProjects,
+        result: "ok",
+        data: {
+          user: {
+            email: newInterviewer.email,
+            avatar: newInterviewer.avatar,
+            username: newInterviewer.username,
+            myProjects: newInterviewer.myProjects,
+            joinedProjects: newInterviewer.joinedProjects,
           },
           "token": accessToken,
         },
