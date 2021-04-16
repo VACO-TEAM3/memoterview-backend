@@ -10,4 +10,4 @@ function validateLoginData(data) {
   return schema.validate({ ...data });
 }
 
-module.exports.checkLoginData = validateLoginData;
+module.exports.validateLoginData = validateLoginData;
