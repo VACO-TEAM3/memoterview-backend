@@ -12,7 +12,7 @@ const commentSchema = new mongoose.Schema({
   commentor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Interviewer",
-  }
+  },
 }, { _id: false });
 
 const questionSchema = new mongoose.Schema({
@@ -31,7 +31,7 @@ const questionSchema = new mongoose.Schema({
   questioner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Interviewer",
-  }
+  },
 }, { _id: false });
 
 const intervieweeSchema = new mongoose.Schema({

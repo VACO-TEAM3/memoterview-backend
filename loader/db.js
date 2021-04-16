@@ -10,7 +10,7 @@ mongoose.connect(process.env.MONGO_DB_URL, {
 
 const db = mongoose.connection;
 
-db.on("error", (error) => {
+db.on("error", error => {
   console.error("db connection error", error);
 });
 
