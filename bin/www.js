@@ -1,7 +1,7 @@
 
 /**
- * Module dependencies.
- */
+* Module dependencies.
+*/
 
 const app = require("../app");
 const debug = require("debug")("memoterview-backend:server");
@@ -9,32 +9,32 @@ const http = require("http");
 const { port } = require("../src/config");
 
 /**
-  * Get port from environment and store in Express.
-  */
+* Get port from environment and store in Express.
+*/
 
 app.set("port", port);
 
 /**
-  * Create HTTP server.
-  */
+* Create HTTP server.
+*/
 
 const server = http.createServer(app);
 
 /**
-  * Listen on provided port, on all network interfaces.
-  */
+* Listen on provided port, on all network interfaces.
+*/
 
 server.listen(port, () => console.log(`server is listening ${port}`));
 server.on("error", onError);
 server.on("listening", onListening);
 
 /**
-  * Normalize a port into a number, string, or false.
-  */
+* Normalize a port into a number, string, or false.
+*/
 
 /**
-  * Event listener for HTTP server "error" event.
-  */
+* Event listener for HTTP server "error" event.
+*/
 
 function onError(error) {
   if (error.syscall !== "listen") {
@@ -59,7 +59,7 @@ function onError(error) {
 
 
 /**
-  * Event listener for HTTP server "listening" event.
+* Event listener for HTTP server "listening" event.
 */
 
 function onListening() {
