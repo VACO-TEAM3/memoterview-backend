@@ -35,7 +35,6 @@ router.post("/", async (req, res, next) => {
         candidates,
         createdAt,
       },
-      createProjectError,
     } = await createProject(project, session);
 
     await addToMyProjects(creator, _id, session);

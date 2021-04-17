@@ -50,8 +50,12 @@ exports.addToJoinedProjects = async (participants, _id, session) => {
 
 exports.getMyProjects = async (interviewerId) => {
   try {
-    const interviewer = await Project.findOne({ id: interviewerId });
-    return { interviewer };
+    const { myProjects } = await Interviewer
+      .findOne({ _id: interviewerId })
+      .populate("myProjects")
+      .lean();
+
+    return { myProjects };
   } catch (error) {
     return { getMyProjectError: error };
   }
