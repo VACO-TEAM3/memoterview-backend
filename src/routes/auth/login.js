@@ -19,15 +19,23 @@ router.post("/", async (req, res, next) => {
     }
 
     const { email, imageUrl, name } = user;
-    const { interviewer, error } = await checkUser(email);
+    const { interviewer, checkUserError } = await checkUser(email);
     let newUser;
 
-    if (error) {
-      next(createError(error));
+    if (checkUserError) {
+      next(createError(500));
+      return;
     }
 
     if (!interviewer) {
-      newUser = await createUser(email, imageUrl, name);
+      const { newInterviewer, createUserError } = await createUser(email, imageUrl, name);
+
+      if (createUserError) {
+        next(createError(500));
+        return;
+      }
+
+      newUser = newInterviewer;
     }
 
     const userInfo = newUser ? newUser.newInterviewer : interviewer;

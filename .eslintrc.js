@@ -40,7 +40,7 @@ module.exports = {
     "no-restricted-syntax": ["off", "ForOfStatement"], // disallow specified syntax(ex. WithStatement)
     "prefer-arrow-callback": "off", // Require using arrow functions for callbacks
     "require-await": "error",
-    "arrow-parens": ["error", "as-needed"], // a => {}
+    // "arrow-parens": ["error", "as-needed"], // a => {}
     "no-param-reassign": ["error", { props: false }],
     "no-unused-expressions": [
       "error",

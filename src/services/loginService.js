@@ -6,7 +6,7 @@ exports.checkUser = async email => {
 
     return { interviewer };
   } catch (error) {
-    return { error };
+    return { checkUserError: error };
   }
 };
 
@@ -20,6 +20,6 @@ exports.createUser = async (email, imageUrl, name) => {
 
     return { newInterviewer };
   } catch (error) {
-    return { error };
+    return { createUserError: error };
   }
 };
