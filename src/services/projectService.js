@@ -16,13 +16,13 @@ exports.createProject = async ({ title, filters, creator, participants }) => {
   }
 };
 
-exports.addToMyProjects = async (creator, _id) => {
+exports.addToMyProjects = async (creator, _id, session) => {
   try {
     const myProjects = await Interviewer.findByIdAndUpdate(
       creator,
       { $push: { "myProjects": _id } },
       { upsert: true, new: true }
-    );
+    ).session(session);
 
     return { myProjects };
   } catch (error) {
@@ -30,14 +30,14 @@ exports.addToMyProjects = async (creator, _id) => {
   }
 };
 
-exports.addToJoinedProjects = async (participants, _id) => {
+exports.addToJoinedProjects = async (participants, _id, session) => {
   try {
     const joinedProjects = participants.map((participantId) =>
       Interviewer.findByIdAndUpdate(
         participantId,
         { $push: { "joinedProjects": _id } },
         { upsert: true, new: true }
-      )
+      ).session(session)
     );
 
     const joinedProjectResults = await Promise.all(joinedProjects);
