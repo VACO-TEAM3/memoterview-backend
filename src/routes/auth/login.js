@@ -33,8 +33,6 @@ router.post("/", async (req, res, next) => {
     const userInfo = newUser ? newUser.newInterviewer : interviewer;
     const accessToken = await signAccessToken(userInfo);
 
-    console.log(accessToken, "acc");
-
     return res.json({
       result: "ok",
       data: {
