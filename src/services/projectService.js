@@ -26,6 +26,24 @@ exports.addToMyProjects = async (creator, _id) => {
 
     return { myProjects };
   } catch (error) {
-    return { addMyProjectsError: error };
+    return { addToMyProjectsError: error };
+  }
+};
+
+exports.addToJoinedProjects = async (participants, _id) => {
+  try {
+    const joinedProjects = participants.map((participantId) =>
+      Interviewer.findByIdAndUpdate(
+        participantId,
+        { $push: { "joinedProjects": _id } },
+        { upsert: true, new: true }
+      )
+    );
+
+    const joinedProjectResults = await Promise.all(joinedProjects);
+
+    return { joinedProjectResults };
+  } catch (error) {
+    return { addToJoinedProjectsError: error };
   }
 };
