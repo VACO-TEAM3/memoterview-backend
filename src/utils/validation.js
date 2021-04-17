@@ -9,3 +9,14 @@ exports.validateLoginData = data => {
 
   return schema.validate({ ...data });
 };
+
+exports.validateNewProjectData = data => {
+  const schema = Joi.object({
+    title: Joi.string().required(),
+    filters: Joi.array().required(),
+    participants: Joi.array().required(),
+    creator: Joi.string().required(),
+  });
+
+  return schema.validate({ ...data });
+};
