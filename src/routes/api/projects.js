@@ -1,18 +1,39 @@
 const express = require("express");
 const router = express.Router();
-const { createProject, addToMyProjects, addToJoinedProjects } = require("../../services/projectService");
+const { startSession } = require("mongoose");
+const {
+  createProject,
+  addToMyProjects,
+  addToJoinedProjects,
+} = require("../../services/projectService");
 
 router.post("/", async (req, res, next) => {
+  const session = await startSession();
+
   try {
+    session.startTransaction();
     const project = req.body;
 
+    // TO-DO : Handling session for Model.Create()
+    // TO-DO : Validate transaction through intentional mistakes
     const {
-      newProject: { _id, creator, participants, title, filters, candidates, createdAt },
-      createProjectError
-    } = await createProject(project);
+      newProject: {
+        _id,
+        creator,
+        participants,
+        title,
+        filters,
+        candidates,
+        createdAt,
+      },
+      createProjectError,
+    } = await createProject(project, session);
 
-    const { myProjects, addToMyProjectsError } = await addToMyProjects(creator, _id);
-    const { joinedProjectResults, error } = await addToJoinedProjects(participants, _id);
+    await addToMyProjects(creator, _id, session);
+    await addToJoinedProjects(participants, _id, session);
+
+    await session.commitTransaction();
+    session.endSession();
 
     return res.json({
       result: "ok",
@@ -27,6 +48,8 @@ router.post("/", async (req, res, next) => {
       },
     });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     next(error);
   }
 });
