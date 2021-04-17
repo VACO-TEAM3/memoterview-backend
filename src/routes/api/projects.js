@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { startSession } = require("mongoose");
+const { validateNewProjectData } = require("../../utils/validation");
 const {
   createProject,
   addToMyProjects,
@@ -13,6 +14,14 @@ router.post("/", async (req, res, next) => {
   try {
     session.startTransaction();
     const project = req.body;
+    const validationResult = validateNewProjectData(project);
+
+    if (validationResult.error) {
+      return res.status(400).json({
+        result: "error",
+        errMessage: "We can't login (or sign up) for unknown reasons",
+      });
+    }
 
     // TO-DO : Handling session for Model.Create()
     // TO-DO : Validate transaction through intentional mistakes
