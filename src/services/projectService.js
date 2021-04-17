@@ -47,3 +47,12 @@ exports.addToJoinedProjects = async (participants, _id, session) => {
     return { addToJoinedProjectsError: error };
   }
 };
+
+exports.getMyProjects = async (interviewerId) => {
+  try {
+    const interviewer = await Project.findOne({ id: interviewerId });
+    return { interviewer };
+  } catch (error) {
+    return { getMyProjectError: error };
+  }
+};
