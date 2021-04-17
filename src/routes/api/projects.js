@@ -6,12 +6,27 @@ router.post("/", async (req, res, next) => {
   try {
     const project = req.body;
 
-    const { newProject: { _id, creator, participants }, createProjectError } = await createProject(project);
+    const {
+      newProject: { _id, creator, participants, title, filters, candidates, createdAt },
+      createProjectError
+    } = await createProject(project);
+
     const { myProjects, addToMyProjectsError } = await addToMyProjects(creator, _id);
     const { joinedProjectResults, error } = await addToJoinedProjects(participants, _id);
 
+    return res.json({
+      result: "ok",
+      data: {
+        id: _id,
+        title,
+        filters,
+        creator,
+        participants,
+        createAt: createdAt,
+        candidateNum: candidates.length,
+      },
+    });
   } catch (error) {
-    console.error(error);
     next(error);
   }
 });
