@@ -60,3 +60,16 @@ exports.getMyProjects = async (interviewerId) => {
     return { getMyProjectError: error };
   }
 };
+
+exports.getJoinedProjects = async (interviewerId) => {
+  try {
+    const { joinedProjects } = await Interviewer
+      .findOne({ _id: interviewerId })
+      .populate("joinedProjects")
+      .lean();
+
+    return { joinedProjects };
+  } catch (error) {
+    return { getJoinedProjectsError: error };
+  }
+};
