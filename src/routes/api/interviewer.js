@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { getMyProjects } = require("../../services/projectService");
+const { getMyProjects, getJoinedProjects } = require("../../services/projectService");
 
 router.get("/:id/my_projects", async (req, res, next) => {
   try {
@@ -22,6 +22,14 @@ router.get("/:id/my_projects", async (req, res, next) => {
       result: "ok",
       data: myProjectsFormat,
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/:id/joined_projects", async (req, res, next) => {
+  try {
+
   } catch (error) {
     next(error);
   }
