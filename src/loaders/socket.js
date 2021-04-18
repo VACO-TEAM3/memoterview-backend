@@ -1,33 +1,26 @@
 module.exports = ({ app }) => {
   const io = require("socket.io")();
 
-  const interviewRoom = {};
-
-  const interview = io.of("/interview-socket").on("connection", (socket) => {
-    socket.on("joinRoom", ({ roomId }) => {
-      const room = roomId;
-
+  io.on("connection", (socket) => {
+    socket.on("join", ({ room }) => {
       socket.join(room);
 
-      if (!interviewRoom[roomId]) {
-        interviewRoom[roomId] = {};
-      }
+      const currentMembers = io.of("/").adapter.rooms.get(room);
+      
+      io.sockets.emit("join", socket.id, Array.from(currentMembers));
     });
 
-    socket.on("leaveRoom", ({ roomId, userId }) => {
-      const room = roomId;
-
-      socket.leave(room);
-
-      const roomInfos = interviewRoom[roomId];
-
-      if (roomInfos && userId in roomInfos) {
-        delete roomInfos[userId];
-      }
+    socket.on("signaling", (toId, message) => {
+      io.to(toId).emit("signaling", socket.id, message);
     });
 
-    socket.on("signal", ({ toId, message }) => {
-      socket.broadcast.to(toId).emit("signal", socket.id, message);
+    socket.on("message", (toId, message) => {
+      console.log(toId, message);
+      io.to(toId).emit("message", socket.id, message);
+    });
+
+    socket.on("disconnect", () => {
+      io.sockets.emit("user-left", socket.id);
     });
   });
 
