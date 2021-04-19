@@ -1,6 +1,6 @@
 const createError = require("http-errors");
 
-exports.default = function validate(schema, property) {
+module.exports = function validate(schema, property) {
   return (req, res, next) => {
     const { error } = schema.validate(req[property]);
     const valid = error == null;

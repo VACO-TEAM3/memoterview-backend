@@ -3,7 +3,7 @@ const createError = require("http-errors");
 
 const { checkUser, createUser } = require("../../services/loginService");
 const { signAccessToken } = require("../../utils/jwtHelpers");
-const { default: validate } = require("../middlewares/validate");
+const validate = require("../middlewares/validate");
 const { loginBodySchema } = require("../../utils/validationSchema");
 
 const router = express.Router();
