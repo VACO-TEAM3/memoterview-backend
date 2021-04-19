@@ -62,7 +62,19 @@ router.get("/search", async (req, res, next) => {
     if (validationResult.error) {
       return next(createError(400));
     }
-    
+
+    const { emailSearchList } = await searchByEmail(req.query.email);
+
+    const refinedEmailSearchList = emailSearchList.map((searchItem) => ({
+      id: searchItem._id,
+      name: searchItem.username,
+      email: searchItem.email,
+    }));
+
+    return res.json({
+      result: "ok",
+      data: refinedEmailSearchList,
+    });
   } catch (error) {
     next(error);
   }
