@@ -6,6 +6,7 @@ const {
   createProject,
   addToMyProjects,
   addToJoinedProjects,
+  deleteProjects,
 } = require("../../services/projectService");
 const validate = require("../middlewares/validate");
 
@@ -64,10 +65,15 @@ router.post(
 router.delete(
   "/:project_id",
   validate(projectIdParamsSchema, "params"),
-  (req, res, next) => {
+  async (req, res, next) => {
     try {
+      const { project_id: projectId } = req.params;
+
+      const { deletedProject } = await deleteProjects(projectId);
+
       return res.json({
         result: "ok",
+        data: deletedProject,
       });
     } catch (error) {
       next(error);
