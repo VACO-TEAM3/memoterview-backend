@@ -18,15 +18,33 @@ exports.searchByEmail = async (email) => {
   }
 };
 
-exports.deleteProjectOnMyProjectList = async ({ userId, projectId }) => {
+exports.deleteProjectOnMyProjects = async ({ creator, projectId }) => {
   try {
     const myProjects = await Interviewer.findByIdAndUpdate(
-      userId,
+      creator,
       { $pull: { myProjects: projectId } },
       { safe: true, upsert: true }
     );
 
     return { myProjects };
+  } catch (error) {
+    return { error };
+  }
+};
+
+exports.deleteProjectOnJoinedProjects = async ({ participants, projectId }) => {
+  try {
+    const joinedProjects = participants.map((participantId) =>
+      Interviewer.findByIdAndUpdate(
+        participantId,
+        { $pull: { joinedProjects: projectId } },
+        { safe: true, upsert: true }
+      )
+    );
+
+    const joinedProjectsResults = await Promise.all(joinedProjects);
+
+    return { joinedProjectsResults };
   } catch (error) {
     return { error };
   }
