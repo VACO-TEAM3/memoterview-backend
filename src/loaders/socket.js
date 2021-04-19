@@ -1,61 +1,52 @@
 module.exports = ({ app }) => {
   const io = require("socket.io")();
 
+  const users = {};
+  const socketToRoom = {};
+
   io.on("connection", (socket) => {
-    socket.on("join room", ({ room }) => {
-      socket.join(room);
-      console.log(room);
-      const members = Array.from(io.of("/").adapter.rooms.get(room));
-      console.log(members);
-      if (members) {
-        const memberCount = members.length;
+    socket.on("join room", (roomID, cb) => {
+      if (users[roomID]) {
+        const length = users[roomID].length;
 
-        if (memberCount === 5) {
-          socket.emit("room full");
+        // if (length === 5) {
+        //   socket.emit("room full");
 
-          return;
-        }
- 
-        const currentUsers = members.filter((id) => id !== socket.id);
-    
-        io.sockets.emit("all users", currentUsers);
+        //   return;
+        // }
+
+        users[roomID].push(socket.id);
+      } else {
+        users[roomID] = [socket.id];
       }
 
-      socket.on("sending signal", ({ userToSignal, callerId, signal }) => {
-        io.to(userToSignal).emit("user joined", { signal, callerId });
-      });
+      socketToRoom[socket.id] = roomID;
+      const usersInThisRoom = users[roomID].filter(id => id !== socket.id);
+      console.log(usersInThisRoom);
+      socket.emit("all users", usersInThisRoom);
 
-      socket.on("returning signal", ({ signal, callerId }) => {
-        io.to(callerId).emit("receiving returned signal", { signal, id: socket.id });
-      });
-
-      socket.on("disconnect", ({ room }) => {
-        socket.leave(room);
-      });
+      return cb();
     });
 
-    // // socket.on("signaling", (toId, message) => {
-    // //   io.to(toId).emit("signaling", socket.id, message);
-    // // });
+    socket.on("sending signal", (payload) => {
+      console.log(payload);
+      io.to(payload.userToSignal).emit("user joined", { signal: payload.signal, callerID: payload.callerID });
+    });
 
-    // socket.on("icecandidate", (toId, message) => {
-    //   console.log(toId);
-    //   io.to(toId).emit("icecandidate", socket.id, message);
-    // });
+    socket.on("returning signal", (payload) => {
+      console.log("return", payload);
+      io.to(payload.callerID).emit("receiving returned signal", { signal: payload.signal, id: socket.id });
+    });
 
-    // socket.on("offer", (toId, message) => {
-    //   console.log(toId);
-    //   io.to(toId).emit("offer", socket.id, message);
-    // });
+    socket.on("disconnect", () => {
+      const roomID = socketToRoom[socket.id];
+      let room = users[roomID];
 
-    // socket.on("answer", (toId, message) => {
-    //   console.log(toId);
-    //   io.to(toId).emit("answer", socket.id, message);
-    // });
-
-    // socket.on("disconnect", () => {
-    //   io.sockets.emit("user-left", socket.id);
-    // });
+      if (room) {
+        room = room.filter(id => id !== socket.id);
+        users[roomID] = room;
+      }
+    });
   });
 
   app.io = io;
