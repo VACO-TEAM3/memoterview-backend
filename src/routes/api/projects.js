@@ -10,6 +10,7 @@ const {
 } = require("../../services/projectService");
 const validate = require("../middlewares/validate");
 const { deleteProjectOnMyProjects, deleteProjectOnJoinedProjects } = require("../../services/interviewerService");
+const { deleteInterviewees } = require("../../services/intervieweeService");
 
 const router = express.Router();
 
@@ -72,11 +73,13 @@ router.delete(
 
       const { deletedProject } = await deleteProjects(projectId);
 
-      const { creator, participants } = deletedProject;
+      const { creator, participants, candidates } = deletedProject;
 
       await deleteProjectOnMyProjects({ creator, projectId });
 
-      await deleteProjectOnJoinedProjects( { participants, projectId });
+      await deleteProjectOnJoinedProjects({ participants, projectId });
+
+      await deleteInterviewees({ intervieweeIds: candidates });
 
       return res.json({
         result: "ok",
