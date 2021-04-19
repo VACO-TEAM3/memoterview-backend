@@ -8,7 +8,7 @@ exports.createProject = async ({ title, filters, creator, participants }) => {
       filters,
       creator,
       participants,
-    });
+    }); // todo. session 넣기
 
     return { newProject };
   } catch (error) {
@@ -20,7 +20,7 @@ exports.addToMyProjects = async (creator, _id, session) => {
   try {
     const myProjects = await Interviewer.findByIdAndUpdate(
       creator,
-      { $push: { "myProjects": _id } },
+      { $push: { myProjects: _id } },
       { upsert: true, new: true }
     ).session(session);
 
@@ -35,7 +35,7 @@ exports.addToJoinedProjects = async (participants, _id, session) => {
     const joinedProjects = participants.map((participantId) =>
       Interviewer.findByIdAndUpdate(
         participantId,
-        { $push: { "joinedProjects": _id } },
+        { $push: { joinedProjects: _id } },
         { upsert: true, new: true }
       ).session(session)
     );
@@ -50,8 +50,7 @@ exports.addToJoinedProjects = async (participants, _id, session) => {
 
 exports.getMyProjects = async (interviewerId) => {
   try {
-    const { myProjects } = await Interviewer
-      .findOne({ _id: interviewerId })
+    const { myProjects } = await Interviewer.findOne({ _id: interviewerId })
       .populate("myProjects")
       .lean();
 
@@ -63,8 +62,7 @@ exports.getMyProjects = async (interviewerId) => {
 
 exports.getJoinedProjects = async (interviewerId) => {
   try {
-    const { joinedProjects } = await Interviewer
-      .findOne({ _id: interviewerId })
+    const { joinedProjects } = await Interviewer.findOne({ _id: interviewerId })
       .populate("joinedProjects")
       .lean();
 
@@ -74,9 +72,10 @@ exports.getJoinedProjects = async (interviewerId) => {
   }
 };
 
-exports.deleteProjects = async (projectId) => {
+exports.deleteProjects = async (projectId, session) => {
   try {
-    const deletedProject = await Project.findByIdAndDelete(projectId);
+    const deletedProject = await Project.findByIdAndDelete(projectId)
+      .session(session);
 
     return { deletedProject };
   } catch (error) {

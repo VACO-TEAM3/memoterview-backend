@@ -68,24 +68,32 @@ router.delete(
   "/:project_id",
   validate(projectIdParamsSchema, "params"),
   async (req, res, next) => {
+    const session = await startSession();
+
     try {
+      session.startTransaction();
       const { project_id: projectId } = req.params;
 
-      const { deletedProject } = await deleteProjects(projectId);
+      const { deletedProject } = await deleteProjects(projectId, session);
 
       const { creator, participants, candidates } = deletedProject;
 
-      await deleteProjectOnMyProjects({ creator, projectId });
+      await deleteProjectOnMyProjects({ creator, projectId }, session);
 
-      await deleteProjectOnJoinedProjects({ participants, projectId });
+      await deleteProjectOnJoinedProjects({ participants, projectId }, session);
 
-      await deleteInterviewees({ intervieweeIds: candidates });
+      await deleteInterviewees({ intervieweeIds: candidates }, session);
+
+      await session.commitTransaction();
+      session.endSession();
 
       return res.json({
         result: "ok",
         data: deletedProject,
       });
     } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
       next(error);
     }
   }
