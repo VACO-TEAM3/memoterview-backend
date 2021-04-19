@@ -8,7 +8,7 @@ const speechToTextRouter = require("./speechToText");
 const authentication = require("../middlewares/authenticate");
 
 router.use("/api/login", loginRouter);
-router.use("/api/interviewer", authentication, interviewerRouter);
+router.use("/api/interviewers", authentication, interviewerRouter);
 router.use("/api/projects", authentication, projectsRouter);
 router.use("/api/speech-to-text", speechToTextRouter);
 
