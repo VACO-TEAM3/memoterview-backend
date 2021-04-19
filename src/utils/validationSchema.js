@@ -6,7 +6,7 @@ exports.loginBodySchema = Joi.object({
   name: Joi.string().required(),
 });
 
-exports.projectBodySchema = Joi.object({
+exports.createProjectBodySchema = Joi.object({
   title: Joi.string().required(),
   filters: Joi.array().required(),
   participants: Joi.array().required(),

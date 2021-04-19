@@ -1,6 +1,6 @@
 const express = require("express");
-const { searchByEmail } = require("../../services/interviewerService");
 
+const { searchByEmail } = require("../../services/interviewerService");
 const {
   getMyProjects,
   getJoinedProjects,
