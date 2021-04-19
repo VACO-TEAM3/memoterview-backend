@@ -7,7 +7,7 @@ const {
 } = require("../../services/projectService");
 const {
   searchInterviewersQuerySchema,
-  userIdParameterSchema,
+  userIdParamsSchema,
 } = require("../../utils/validationSchema");
 const validate = require("../middlewares/validate");
 
@@ -15,7 +15,7 @@ const router = express.Router();
 
 router.get(
   "/:user_id/my_projects",
-  validate(userIdParameterSchema, "params"),
+  validate(userIdParamsSchema, "params"),
   async (req, res, next) => {
     try {
       const interviewerId = req.user._id;
@@ -43,7 +43,7 @@ router.get(
 
 router.get(
   "/:user_id/joined_projects",
-  validate(userIdParameterSchema, "params"),
+  validate(userIdParamsSchema, "params"),
   async (req, res, next) => {
     try {
       const interviewerId = req.user._id;
