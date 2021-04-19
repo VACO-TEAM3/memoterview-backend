@@ -7,7 +7,7 @@ const {
   addToMyProjects,
   addToJoinedProjects,
 } = require("../../services/projectService");
-const { default: validate } = require("../middlewares/validate");
+const validate = require("../middlewares/validate");
 
 const router = express.Router();
 
