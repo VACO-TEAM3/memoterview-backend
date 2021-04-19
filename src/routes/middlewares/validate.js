@@ -14,6 +14,7 @@ exports.default = function validate(schema, property) {
       if (property === "params") {
         return next(createError(404, { message }));
       }
+
       return next(createError(422, { message }));
     }
   };
