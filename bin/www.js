@@ -6,7 +6,7 @@
 const app = require("../app");
 const debug = require("debug")("memoterview-backend:server");
 const http = require("http");
-const { port } = require("../src/config");
+const { port, socketClientURL } = require("../src/config");
 
 /**
  * Get port from environment and store in Express.
@@ -28,6 +28,13 @@ server.listen(port, () => console.log(`server is listening ${port}`));
 server.on("error", onError);
 server.on("listening", onListening);
 
+app.io.attach(server, {
+  cors: {
+    origin: socketClientURL,
+    credential: true,
+    transports: ["websocket"],
+  },
+});
 /**
  * Event listener for HTTP server "error" event.
  */

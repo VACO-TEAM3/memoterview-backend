@@ -6,6 +6,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || "development";
 module.exports = {
   port: normalizePort(process.env.PORT || "5000"),
   databaseURL: process.env.MONGO_DB_URL,
+  socketClientURL: process.env.CLIENT_URI,
   accessToken: {
     accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
     accessTokenExpiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
