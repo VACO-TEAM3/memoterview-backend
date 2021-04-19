@@ -18,13 +18,13 @@ exports.searchByEmail = async (email) => {
   }
 };
 
-exports.deleteProjectOnMyProjects = async ({ creator, projectId }) => {
+exports.deleteProjectOnMyProjects = async ({ creator, projectId }, session) => {
   try {
     const deletedMyProjects = await Interviewer.findByIdAndUpdate(
       creator,
       { $pull: { myProjects: projectId } },
       { safe: true, upsert: true }
-    );
+    ).session(session);
 
     return { deletedMyProjects };
   } catch (error) {
@@ -32,14 +32,14 @@ exports.deleteProjectOnMyProjects = async ({ creator, projectId }) => {
   }
 };
 
-exports.deleteProjectOnJoinedProjects = async ({ participants, projectId }) => {
+exports.deleteProjectOnJoinedProjects = async ({ participants, projectId }, session) => {
   try {
     const deletedJoinedProjects = participants.map((participantId) =>
       Interviewer.findByIdAndUpdate(
         participantId,
         { $pull: { joinedProjects: projectId } },
         { safe: true, upsert: true }
-      )
+      ).session(session)
     );
 
     const joinedProjectsResults = await Promise.all(deletedJoinedProjects);
