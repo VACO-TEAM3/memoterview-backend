@@ -13,10 +13,14 @@ exports.createProjectBodySchema = Joi.object({
   creator: Joi.string().required(),
 });
 
+exports.projectIdParamsSchema = Joi.object({
+  project_id: Joi.string().required(),
+});
+
 exports.searchInterviewersQuerySchema = Joi.object({
   email: Joi.string().required(),
 });
 
-exports.userIdParameterSchema = Joi.object({
+exports.userIdParamsSchema = Joi.object({
   user_id: Joi.string().required(),
 });

@@ -1,7 +1,7 @@
 const express = require("express");
 const { startSession } = require("mongoose");
 
-const { createProjectBodySchema } = require("../../utils/validationSchema");
+const { createProjectBodySchema, projectIdParamsSchema } = require("../../utils/validationSchema");
 const {
   createProject,
   addToMyProjects,
@@ -56,6 +56,20 @@ router.post(
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
+      next(error);
+    }
+  }
+);
+
+router.delete(
+  "/:project_id",
+  validate(projectIdParamsSchema, "params"),
+  (req, res, next) => {
+    try {
+      return res.json({
+        result: "ok",
+      });
+    } catch (error) {
       next(error);
     }
   }
