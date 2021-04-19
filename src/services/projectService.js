@@ -73,3 +73,13 @@ exports.getJoinedProjects = async (interviewerId) => {
     return { getJoinedProjectsError: error };
   }
 };
+
+exports.deleteProjects = async (projectId) => {
+  try {
+    const deletedProject = await Project.findByIdAndDelete(projectId);
+
+    return { deletedProject };
+  } catch (error) {
+    return { deleteProjectsError: error };
+  }
+};
