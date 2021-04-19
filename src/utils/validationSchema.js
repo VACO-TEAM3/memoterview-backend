@@ -16,3 +16,7 @@ exports.projectBodySchema = Joi.object({
 exports.searchInterviewersQuerySchema = Joi.object({
   email: Joi.string().required(),
 });
+
+exports.userIdParameterSchema = Joi.object({
+  user_id: Joi.string().required(),
+});
