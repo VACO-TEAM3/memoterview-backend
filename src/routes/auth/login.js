@@ -1,22 +1,16 @@
 const express = require("express");
-const router = express.Router();
 const createError = require("http-errors");
 
-const { validateLoginData } = require("../../utils/validation");
 const { checkUser, createUser } = require("../../services/loginService");
 const { signAccessToken } = require("../../utils/jwtHelpers");
+const { default: validate } = require("../middlewares/validate");
+const { loginBodySchema } = require("../../utils/validationSchema");
 
-router.post("/", async (req, res, next) => {
+const router = express.Router();
+
+router.post("/", validate(loginBodySchema, "body"), async (req, res, next) => {
   try {
     const user = req.body;
-    const validationResult = validateLoginData(user);
-
-    if (validationResult.error) {
-      return res.status(400).json({
-        result: "error",
-        errMessage: "We can't login (or sign up) for unknown reasons",
-      });
-    }
 
     const { email, imageUrl, name } = user;
     const { interviewer, error } = await checkUser(email);

@@ -1,65 +1,64 @@
 const express = require("express");
-const router = express.Router();
 const { startSession } = require("mongoose");
-const { validateNewProjectData } = require("../../utils/validation");
+
+const { createProjectBodySchema } = require("../../utils/validationSchema");
 const {
   createProject,
   addToMyProjects,
   addToJoinedProjects,
 } = require("../../services/projectService");
+const { default: validate } = require("../middlewares/validate");
 
-router.post("/", async (req, res, next) => {
-  const session = await startSession();
+const router = express.Router();
 
-  try {
-    session.startTransaction();
-    const project = req.body;
-    const validationResult = validateNewProjectData(project);
+router.post(
+  "/",
+  validate(createProjectBodySchema, "body"),
+  async (req, res, next) => {
+    const session = await startSession();
 
-    if (validationResult.error) {
-      return res.status(400).json({
-        result: "error",
-        errMessage: "We can't login (or sign up) for unknown reasons",
+    try {
+      session.startTransaction();
+      const project = req.body;
+
+      // TO-DO : Handling session for Model.Create()
+      // TO-DO : Validate transaction through intentional mistakes
+      const {
+        newProject: {
+          _id,
+          creator,
+          participants,
+          title,
+          filters,
+          candidates,
+          createdAt,
+        },
+      } = await createProject(project, session);
+
+      await addToMyProjects(creator, _id, session);
+      await addToJoinedProjects(participants, _id, session);
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return res.json({
+        result: "ok",
+        data: {
+          id: _id,
+          title,
+          filters,
+          creator,
+          participants,
+          createAt: createdAt,
+          candidateNum: candidates.length,
+        },
       });
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      next(error);
     }
-
-    // TO-DO : Handling session for Model.Create()
-    // TO-DO : Validate transaction through intentional mistakes
-    const {
-      newProject: {
-        _id,
-        creator,
-        participants,
-        title,
-        filters,
-        candidates,
-        createdAt,
-      },
-    } = await createProject(project, session);
-
-    await addToMyProjects(creator, _id, session);
-    await addToJoinedProjects(participants, _id, session);
-
-    await session.commitTransaction();
-    session.endSession();
-
-    return res.json({
-      result: "ok",
-      data: {
-        id: _id,
-        title,
-        filters,
-        creator,
-        participants,
-        createAt: createdAt,
-        candidateNum: candidates.length,
-      },
-    });
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    next(error);
   }
-});
+);
 
 module.exports = router;
