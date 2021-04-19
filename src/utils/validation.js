@@ -1,6 +1,6 @@
 const Joi = require("joi");
 
-exports.validateLoginData = data => {
+exports.validateLoginData = (data) => {
   const schema = Joi.object({
     email: Joi.string().email({ minDomainSegments: 2 }).required(),
     imageUrl: Joi.string().required(),
@@ -10,7 +10,7 @@ exports.validateLoginData = data => {
   return schema.validate({ ...data });
 };
 
-exports.validateNewProjectData = data => {
+exports.validateNewProjectData = (data) => {
   const schema = Joi.object({
     title: Joi.string().required(),
     filters: Joi.array().required(),
@@ -19,4 +19,13 @@ exports.validateNewProjectData = data => {
   });
 
   return schema.validate({ ...data });
+};
+
+// Todo. arrow to function definition
+exports.validateGetInterviewersQuery = (query) => {
+  const schema = Joi.object({
+    email: Joi.string().required(),
+  });
+
+  return schema.validate({ ...query });
 };

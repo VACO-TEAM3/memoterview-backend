@@ -1,7 +1,11 @@
 const express = require("express");
-const router = express.Router();
+const createError = require("http-errors");
+const { searchByEmail } = require("../../services/interviewerService");
 
 const { getMyProjects, getJoinedProjects } = require("../../services/projectService");
+const { validateGetInterviewersQuery } = require("../../utils/validation");
+
+const router = express.Router();
 
 router.get("/:id/my_projects", async (req, res, next) => {
   try {
@@ -46,6 +50,19 @@ router.get("/:id/joined_projects", async (req, res, next) => {
       result: "ok",
       data: joinedProjectFormat,
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/search", async (req, res, next) => {
+  try {
+    const validationResult = validateGetInterviewersQuery(req.query);
+
+    if (validationResult.error) {
+      return next(createError(400));
+    }
+    
   } catch (error) {
     next(error);
   }
