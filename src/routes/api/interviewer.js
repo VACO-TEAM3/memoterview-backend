@@ -9,7 +9,7 @@ const {
   searchInterviewersQuerySchema,
   userIdParameterSchema,
 } = require("../../utils/validationSchema");
-const { default: validate } = require("../middlewares/validate");
+const validate = require("../middlewares/validate");
 
 const router = express.Router();
 
