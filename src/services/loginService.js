@@ -1,6 +1,6 @@
 const Interviewer = require("../models/Interviewer");
 
-exports.checkUser = async email => {
+exports.checkUser = async (email) => {
   try {
     const interviewer = await Interviewer.findOne({ email });
 
