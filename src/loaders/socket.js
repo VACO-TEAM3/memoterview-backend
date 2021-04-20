@@ -5,7 +5,7 @@ module.exports = ({ app }) => {
   const socketToRoom = {};
 
   io.on("connection", (socket) => {
-    socket.on("createRoom", ({ creatorID, roomID, intervieweeID }) => {
+    socket.on("createRoom", ({ creatorID, roomID, intervieweeID }) => { // 추후 입장에서 인터뷰이 모드 추가해야함
       if (!users[roomID]) {
         users[roomID] = {
           creator: creatorID,
