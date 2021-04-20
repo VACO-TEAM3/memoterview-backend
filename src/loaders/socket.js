@@ -16,46 +16,56 @@ module.exports = ({ app }) => {
       socket.emit("createRoomSuccess", socket.id);
     });
 
-    socket.on("join room", (roomID, cb) => {
-      if (users[roomID]) {
-        const length = users[roomID].length;
+    socket.on("requestJoin", (roomID, cb) => {
+      if (!users[roomID]) {
+        socket.emit("failToAccess");
 
-        if (length === 5) {
-          socket.emit("room full");
-
-          return;
-        }
-
-        users[roomID].push(socket.id);
-      } else {
-        users[roomID] = [socket.id];
+        return;
       }
 
+      const length = users[roomID].members.length;
+
+      if (length === 5) {
+        socket.emit("roomFull");
+
+        return;
+      }
+
+      users[roomID].members.push(socket.id);
       socketToRoom[socket.id] = roomID;
-      const usersInThisRoom = users[roomID].filter(id => id !== socket.id);
-      console.log(usersInThisRoom);
-      socket.emit("all users", usersInThisRoom);
+
+      const targetUsers = users[roomID].members.filter(id => id !== socket.id);
+
+      socket.emit("successJoin", targetUsers);
 
       return cb();
     });
 
-    socket.on("sending signal", (payload) => {
-      console.log(payload);
-      io.to(payload.userToSignal).emit("user joined", { signal: payload.signal, callerID: payload.callerID });
+    socket.on("sendingSignal", (payload) => {
+      io.to(payload.userToSignal).emit("sendingForUsers", { signal: payload.signal, callerID: payload.callerID });
     });
 
-    socket.on("returning signal", (payload) => {
-      console.log("return", payload);
-      io.to(payload.callerID).emit("receiving returned signal", { signal: payload.signal, id: socket.id });
+    socket.on("returningSignal", (payload) => {
+      io.to(payload.callerID).emit("receivingReturnedSignal", { signal: payload.signal, id: socket.id });
     });
 
-    socket.on("disconnect", () => {
+    socket.on("leaveRoom", () => {
       const roomID = socketToRoom[socket.id];
-      let room = users[roomID];
 
-      if (room) {
-        room = room.filter(id => id !== socket.id);
-        users[roomID] = room;
+      if (users[roomID]) {
+        const leftUsers = users[roomID].members.filter(id => id !== socket.id);
+
+        if (users.length === 0) {
+          delete users[roomID];
+
+          socket.emit("clearRoom");
+
+          return;
+        }
+
+        users[roomID].members = leftUsers;
+
+        socket.emit("successToLeave");
       }
     });
   });
