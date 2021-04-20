@@ -21,40 +21,41 @@ module.exports = ({ app }) => {
       socket.emit("failToAccess", "room is already exists");
     });
 
-    socket.on("requestJoin", (roomID, cb) => {
+    socket.on("requestJoin", (roomID, cb) => {      
       if (!users[roomID]) {
         users[roomID] = {
           members: [],
         };
-
-        return;
       }
 
-      const length = users[roomID].members.length;
+      socket.join(roomID);
 
-      if (length === 5) {
-        socket.emit("failToAccess", "room is full");
+      // const length = users[roomID].members.length;
 
-        return;
-      }
+      // if (length === 5) {
+      //   console.log(400);
+      //   socket.emit("failToAccess", "room is full");
 
-      cb();
+      //   return;
+      // }
 
       users[roomID].members.push(socket.id);
       socketToRoom[socket.id] = roomID;
 
       const targetUsers = users[roomID].members.filter((id) => id !== socket.id);
-
+      
       socket.emit("successJoin", targetUsers);
-      console.log(30);
+
+      cb();
     });
 
-    socket.on("sendingSignal", ({ callee, callerID, signal }) => {
+    socket.on("sendingSignal", ({ calleeID, callerID, signal }) => {
       console.log("sending", callerID);
-      io.to(callee).emit("sendingForUsers", { signal, callerID });
+      io.to(calleeID).emit("sendingForUsers", { signal, callerID });
     });
 
     socket.on("returningSignal", ({ signal, callerID }) => {
+      console.log("returning", callerID);
       io.to(callerID).emit("receivingReturnedSignal", { signal, calleeID: socket.id });
     });
 
