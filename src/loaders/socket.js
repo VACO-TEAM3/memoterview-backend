@@ -2,81 +2,41 @@ module.exports = ({ app }) => {
   const io = require("socket.io")();
 
   const users = {};
-  const socketToRoom = {};
+  const rooms = {};
 
   io.on("connection", (socket) => {
-    socket.on("createRoom", ({ creatorID, roomID, intervieweeID }) => { // 추후 입장에서 인터뷰이 모드 추가해야함
-      if (!users[roomID]) {
-        users[roomID] = {
-          creator: creatorID,
-          interviewee: intervieweeID,
+    socket.on("requestJoinRoom", ({ roomID, userData }) => {
+      if (!rooms[roomID]) {
+        rooms[roomID] = {
           members: [],
         };
+      }
 
-        socket.emit("createRoomSuccess", socket.id);
+      if (rooms[roomID].members.length > 20) {
+        socket.emit("room is full");
 
         return;
       }
 
-      socket.emit("failToAccess", "room is already exists");
-    });
+      rooms[roomID].members.push({ ...userData, socketID: socket.id });
+      users[socket.id] = userData;
 
-    socket.on("requestJoin", (roomID, cb) => {      
-      if (!users[roomID]) {
-        users[roomID] = {
-          members: [],
-        };
-      }
-      console.log("join");
       socket.join(roomID);
 
-      // const length = users[roomID].members.length;
+      const targetUsers = rooms[roomID].members.filter((member) => member.socketID !== socket.id);
 
-      // if (length === 5) {
-      //   console.log(400);
-      //   socket.emit("failToAccess", "room is full");
-
-      //   return;
-      // }
-
-      users[roomID].members.push(socket.id);
-      socketToRoom[socket.id] = roomID;
-
-      const targetUsers = users[roomID].members.filter((id) => id !== socket.id);
-    
-      socket.emit("successJoin", targetUsers);
-      console.log(305);
-      cb();
+      socket.emit("successJoinUser", targetUsers);
+      console.log(socket.id);
     });
 
-    socket.on("sendingSignal", ({ calleeID, callerID, signal }) => {
-      console.log("sending");
-      io.to(calleeID).emit("sendingForUsers", { signal, callerID });
+    socket.on("sendSignal", ({ callee, caller, signal }) => {
+      console.log("sendSignal")
+      io.to(callee).emit("joinNewUser", { signal, caller });
     });
 
-    socket.on("returningSignal", ({ signal, callerID }) => {
-      console.log("returning", callerID);
-      io.to(callerID).emit("receivingReturnedSignal", { signal, calleeID: socket.id });
-    });
-
-    socket.on("leaveRoom", () => {
-      const roomID = socketToRoom[socket.id];
-
-      if (users[roomID]) {
-        const leftUsers = users[roomID].members.filter(id => id !== socket.id);
-
-        if (users.length === 0) {
-          delete users[roomID];
-
-          socket.emit("clearRoom");
-
-          return;
-        }
-
-        users[roomID].members = leftUsers;
-
-        socket.emit("successToLeave");
-      }
+    socket.on("returnSignal", ({ signal, caller }) => {
+      console.log("returnSignal");
+      io.to(caller).emit("receiveReturnSignal", { signal, id: socket.id });
     });
   });
 
