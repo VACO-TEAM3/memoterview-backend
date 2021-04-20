@@ -5,10 +5,11 @@ module.exports = ({ app }) => {
   const socketToRoom = {};
 
   io.on("connection", (socket) => {
-    socket.on("createRoom", ({ creatorID, roomID }) => {
+    socket.on("createRoom", ({ creatorID, roomID, intervieweeID }) => {
       if (!users[roomID]) {
         users[roomID] = {
           creator: creatorID,
+          interviewee: intervieweeID,
           members: [],
         };
 
@@ -38,7 +39,7 @@ module.exports = ({ app }) => {
       users[roomID].members.push(socket.id);
       socketToRoom[socket.id] = roomID;
 
-      const targetUsers = users[roomID].members.filter(id => id !== socket.id);
+      const targetUsers = users[roomID].members.filter((id) => id !== socket.id);
 
       socket.emit("successJoin", targetUsers);
 
