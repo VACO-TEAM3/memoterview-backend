@@ -27,7 +27,7 @@ module.exports = ({ app }) => {
           members: [],
         };
       }
-
+      console.log("join");
       socket.join(roomID);
 
       // const length = users[roomID].members.length;
@@ -43,14 +43,14 @@ module.exports = ({ app }) => {
       socketToRoom[socket.id] = roomID;
 
       const targetUsers = users[roomID].members.filter((id) => id !== socket.id);
-      
+    
       socket.emit("successJoin", targetUsers);
-
+      console.log(305);
       cb();
     });
 
     socket.on("sendingSignal", ({ calleeID, callerID, signal }) => {
-      console.log("sending", callerID);
+      console.log("sending");
       io.to(calleeID).emit("sendingForUsers", { signal, callerID });
     });
 
