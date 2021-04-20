@@ -5,15 +5,26 @@ module.exports = ({ app }) => {
   const socketToRoom = {};
 
   io.on("connection", (socket) => {
+    socket.on("createRoom", ({ creatorID, roomID }) => {
+      if (!users[roomID]) {
+        users[roomID] = {
+          creator: creatorID,
+          members: [],
+        };
+      }
+
+      socket.emit("createRoomSuccess", socket.id);
+    });
+
     socket.on("join room", (roomID, cb) => {
       if (users[roomID]) {
         const length = users[roomID].length;
 
-        // if (length === 5) {
-        //   socket.emit("room full");
+        if (length === 5) {
+          socket.emit("room full");
 
-        //   return;
-        // }
+          return;
+        }
 
         users[roomID].push(socket.id);
       } else {
