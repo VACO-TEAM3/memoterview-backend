@@ -11,14 +11,18 @@ module.exports = ({ app }) => {
           creator: creatorID,
           members: [],
         };
+
+        socket.emit("createRoomSuccess", socket.id);
+
+        return;
       }
 
-      socket.emit("createRoomSuccess", socket.id);
+      socket.emit("failToAccess", "room is already exists");
     });
 
     socket.on("requestJoin", (roomID, cb) => {
       if (!users[roomID]) {
-        socket.emit("failToAccess");
+        socket.emit("failToAccess", "room is not exists");
 
         return;
       }
@@ -26,7 +30,7 @@ module.exports = ({ app }) => {
       const length = users[roomID].members.length;
 
       if (length === 5) {
-        socket.emit("roomFull");
+        socket.emit("failToAccess", "room is full");
 
         return;
       }
