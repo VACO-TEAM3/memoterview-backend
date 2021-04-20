@@ -3,6 +3,7 @@ module.exports = ({ app }) => {
 
   const users = {};
   const rooms = {};
+  const socketToRoom = {};
 
   io.on("connection", (socket) => {
     socket.on("requestJoinRoom", ({ roomID, userData }) => {
@@ -12,7 +13,7 @@ module.exports = ({ app }) => {
         };
       }
 
-      if (rooms[roomID].members.length > 20) {
+      if (rooms[roomID].members.length > 5) {
         socket.emit("room is full");
 
         return;
@@ -20,6 +21,7 @@ module.exports = ({ app }) => {
 
       rooms[roomID].members.push({ ...userData, socketID: socket.id });
       users[socket.id] = userData;
+      socketToRoom[socket.id] = roomID;
 
       socket.join(roomID);
 
@@ -37,6 +39,27 @@ module.exports = ({ app }) => {
     socket.on("returnSignal", ({ signal, caller }) => {
       console.log("returnSignal");
       io.to(caller).emit("receiveReturnSignal", { signal, id: socket.id });
+    });
+
+    socket.on("disconnect", () => {
+      socket.broadcast.emit("userLeft");
+      const roomID = socketToRoom[socket.id];
+
+      const leftUsers = rooms[roomID].members.filter(
+        (member) => member.socketID !== socket.id
+      );
+
+      delete users[socket.id];
+
+      if (leftUsers.length === 0) {
+        delete rooms[roomID];
+
+        return;
+      }
+
+      rooms[roomID].members = leftUsers;
+
+      socket.emit("SuccessToLeave");
     });
   });
 
