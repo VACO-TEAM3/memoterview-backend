@@ -23,7 +23,9 @@ module.exports = ({ app }) => {
 
     socket.on("requestJoin", (roomID, cb) => {
       if (!users[roomID]) {
-        socket.emit("failToAccess", "room is not exists");
+        users[roomID] = {
+          members: [],
+        };
 
         return;
       }
@@ -36,22 +38,24 @@ module.exports = ({ app }) => {
         return;
       }
 
+      cb();
+
       users[roomID].members.push(socket.id);
       socketToRoom[socket.id] = roomID;
 
       const targetUsers = users[roomID].members.filter((id) => id !== socket.id);
 
       socket.emit("successJoin", targetUsers);
-
-      return cb();
+      console.log(30);
     });
 
-    socket.on("sendingSignal", (payload) => {
-      io.to(payload.userToSignal).emit("sendingForUsers", { signal: payload.signal, callerID: payload.callerID });
+    socket.on("sendingSignal", ({ callee, callerID, signal }) => {
+      console.log("sending", callerID);
+      io.to(callee).emit("sendingForUsers", { signal, callerID });
     });
 
-    socket.on("returningSignal", (payload) => {
-      io.to(payload.callerID).emit("receivingReturnedSignal", { signal: payload.signal, id: socket.id });
+    socket.on("returningSignal", ({ signal, callerID }) => {
+      io.to(callerID).emit("receivingReturnedSignal", { signal, calleeID: socket.id });
     });
 
     socket.on("leaveRoom", () => {
