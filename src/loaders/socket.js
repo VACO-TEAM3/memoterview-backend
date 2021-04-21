@@ -60,7 +60,16 @@ module.exports = ({ app }) => {
 
       delete users[socket.id];
 
+      delete socketToRoom[socket.id];
+
       socket.emit("successToLeave");
+    });
+
+    // audio record socket logics
+    socket.on("question", () => {
+      const roomID = socketToRoom[socket.id];
+
+
     });
   });
 
