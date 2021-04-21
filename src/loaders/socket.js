@@ -87,7 +87,21 @@ module.exports = ({ app }) => {
       }
     });
 
-    
+    socket.on("requestAnswer", () => {
+      const roomID = socketToRoom[socket.id];
+
+      if (!checkRoomExists(roomID, socket)) {
+        return;
+      }
+
+      if (!checkIntervieweeExists(roomID, socket)) {
+        return;
+      }
+
+      const intervieweeSocketId = rooms[roomID].interviewee;
+
+      io.to(intervieweeSocketId).emit("answerStart");
+    });
   });
 
   function checkRoomExists(roomID, socket) {
