@@ -47,7 +47,7 @@ module.exports = ({ app }) => {
       );
 
       if (leftUsers?.length !== 0) {
-        if (rooms[roomID]) {
+        if (rooms[roomID]?.members) {
           rooms[roomID].members = leftUsers;
         }
       } else {
