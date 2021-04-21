@@ -19,6 +19,10 @@ module.exports = ({ app }) => {
         return;
       }
 
+      if (userData.isInterviewee) {
+        rooms[roomID].interviewee = socket.id;
+      }
+
       rooms[roomID].members.push({ ...userData, socketID: socket.id });
       users[socket.id] = userData;
       socketToRoom[socket.id] = roomID;
