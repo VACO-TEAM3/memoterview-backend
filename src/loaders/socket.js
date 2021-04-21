@@ -29,7 +29,9 @@ module.exports = ({ app }) => {
 
       socket.join(roomID);
 
-      const targetUsers = rooms[roomID].members.filter((member) => member.socketID !== socket.id);
+      const targetUsers = rooms[roomID].members.filter(
+        (member) => member.socketID !== socket.id
+      );
 
       socket.emit("successJoinUser", targetUsers);
     });
@@ -73,20 +75,26 @@ module.exports = ({ app }) => {
     socket.on("question", ({ userId }) => {
       const roomID = socketToRoom[socket.id];
 
-      if (!checkRoomExists(roomID, socket)) {
-        return;
-      }
-
-      if (!checkIntervieweeExists(roomID, socket)) {
+      if (
+        !checkRoomExists(roomID, socket) ||
+        !checkIntervieweeExists(roomID, socket)
+      ) {
         return;
       }
 
       const intervieweeSocketId = rooms[roomID].interviewee;
       const mySocketId = socket.id;
 
-      rooms[roomID].questioner = { questionerSocketId: socket.id, questionerId: userId };
+      rooms[roomID].questioner = {
+        questionerSocketId: socket.id,
+        questionerId: userId,
+      };
 
-      const otherInterviewers = rooms[roomID].members.filter((member) => member.socketID !== mySocketId && member.socketID !== intervieweeSocketId);
+      const otherInterviewers = rooms[roomID].members.filter(
+        (member) =>
+          member.socketID !== mySocketId &&
+          member.socketID !== intervieweeSocketId
+      );
 
       for (const otherInterviewer of otherInterviewers) {
         io.to(otherInterviewer.socketID).emit("preventButton");
@@ -96,11 +104,10 @@ module.exports = ({ app }) => {
     socket.on("requestAnswer", () => {
       const roomID = socketToRoom[socket.id];
 
-      if (!checkRoomExists(roomID, socket)) {
-        return;
-      }
-
-      if (!checkIntervieweeExists(roomID, socket)) {
+      if (
+        !checkRoomExists(roomID, socket) ||
+        !checkIntervieweeExists(roomID, socket)
+      ) {
         return;
       }
 
@@ -112,15 +119,10 @@ module.exports = ({ app }) => {
     socket.on("endAnswer", () => {
       const roomID = socketToRoom[socket.id];
 
-      if (!checkRoomExists(roomID, socket)) {
-        return;
-      }
-
-      if (!checkIntervieweeExists(roomID, socket)) {
-        return;
-      }
-
-      if (!checkQuestionerExists(roomID, socket)) {
+      if (
+        !checkRoomExists(roomID, socket) ||
+        !checkIntervieweeExists(roomID, socket)
+      ) {
         return;
       }
 
@@ -132,42 +134,40 @@ module.exports = ({ app }) => {
     socket.on("sendAnswer", ({ answer }) => {
       const roomID = socketToRoom[socket.id];
 
-      if (!checkRoomExists(roomID, socket)) {
-        return;
-      }
-
-      if (!checkIntervieweeExists(roomID, socket)) {
-        return;
-      }
-
-      if (!checkQuestionerExists(roomID, socket)) {
+      if (
+        !checkRoomExists(roomID, socket) ||
+        !checkIntervieweeExists(roomID, socket) ||
+        !checkQuestionerExists(roomID, socket)
+      ) {
         return;
       }
 
       const { questionerSocketId, questionerId } = rooms[roomID].questioner;
 
-      io.to(questionerSocketId).emit("questionerReceiveAnswer", { questionerId, answer });
+      io.to(questionerSocketId).emit("questionerReceiveAnswer", {
+        questionerId,
+        answer,
+      });
     });
 
     socket.on("uploadComplete", () => {
       const roomID = socketToRoom[socket.id];
 
-      if (!checkRoomExists(roomID, socket)) {
-        return;
-      }
-
-      if (!checkIntervieweeExists(roomID, socket)) {
-        return;
-      }
-
-      if (!checkQuestionerExists(roomID, socket)) {
+      if (
+        !checkRoomExists(roomID, socket) ||
+        !checkIntervieweeExists(roomID, socket)
+      ) {
         return;
       }
 
       const intervieweeSocketId = rooms[roomID].interviewee;
       const mySocketId = socket.id;
 
-      const otherInterviewers = rooms[roomID].members.filter((member) => member.socketID !== mySocketId && member.socketID !== intervieweeSocketId);
+      const otherInterviewers = rooms[roomID].members.filter(
+        (member) =>
+          member.socketID !== mySocketId &&
+          member.socketID !== intervieweeSocketId
+      );
 
       for (const otherInterviewer of otherInterviewers) {
         io.to(otherInterviewer.socketID).emit("enableButton");
