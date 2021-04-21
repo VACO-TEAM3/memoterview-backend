@@ -65,6 +65,10 @@ module.exports = ({ app }) => {
       socket.emit("successToLeave");
     });
 
+    socket.on("startInterview", () => {
+      socket.broadcast.emit("startInterview");
+    });
+
     // audio record socket logics
     socket.on("question", ({ userId }) => {
       const roomID = socketToRoom[socket.id];
