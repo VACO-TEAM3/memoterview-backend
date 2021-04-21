@@ -14,7 +14,7 @@ module.exports = ({ app }) => {
       }
 
       if (rooms[roomID].members.length > 5) {
-        socket.emit("room is full");
+        socket.emit("error", { message: "room is full" });
 
         return;
       }
@@ -69,9 +69,45 @@ module.exports = ({ app }) => {
     socket.on("question", () => {
       const roomID = socketToRoom[socket.id];
 
+      if (!checkRoomExists(roomID, socket)) {
+        return;
+      }
 
+      if (!checkIntervieweeExists(roomID, socket)) {
+        return;
+      }
+
+      const intervieweeSocketId = rooms[roomID].interviewee;
+      const mySocketId = socket.id;
+
+      const otherInterviewers = rooms[roomID].members.filter((member) => member.socketID !== mySocketId && member.socketID !== intervieweeSocketId);
+
+      for (const otherInterviewer of otherInterviewers) {
+        io.to(otherInterviewer.socketID).emit("preventButton");
+      }
     });
+
+    
   });
+
+  function checkRoomExists(roomID, socket) {
+    if (!rooms[roomID]) {
+      io.to(socket.id).emit("error", { message: "room is not exist" });
+      return false;
+    }
+
+    return true;
+  }
+
+  function checkIntervieweeExists(roomID, socket) {
+    if (!rooms[roomID].interviewee) {
+      io.to(socket.id).emit("error", { message: "interviewee is not exist" });
+      return false;
+    }
+
+    return true;
+  }
+
 
   app.io = io;
 };
