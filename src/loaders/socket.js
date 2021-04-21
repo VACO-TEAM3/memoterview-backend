@@ -124,6 +124,26 @@ module.exports = ({ app }) => {
 
       io.to(intervieweeSocketId).emit("endAnswer");
     });
+
+    socket.on("sendAnswer", ({ answer }) => {
+      const roomID = socketToRoom[socket.id];
+
+      if (!checkRoomExists(roomID, socket)) {
+        return;
+      }
+
+      if (!checkIntervieweeExists(roomID, socket)) {
+        return;
+      }
+
+      if (!checkQuestionerExists(roomID, socket)) {
+        return;
+      }
+
+      const questionerSocketId = rooms[roomID].questioner;
+
+      io.to(questionerSocketId).emit("receiveAnswer", { answer });
+    });
   });
 
   function checkRoomExists(roomID, socket) {
