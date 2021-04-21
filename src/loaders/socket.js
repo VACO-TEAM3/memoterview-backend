@@ -80,6 +80,8 @@ module.exports = ({ app }) => {
       const intervieweeSocketId = rooms[roomID].interviewee;
       const mySocketId = socket.id;
 
+      rooms[roomID].questioner = mySocketId;
+
       const otherInterviewers = rooms[roomID].members.filter((member) => member.socketID !== mySocketId && member.socketID !== intervieweeSocketId);
 
       for (const otherInterviewer of otherInterviewers) {
@@ -100,7 +102,27 @@ module.exports = ({ app }) => {
 
       const intervieweeSocketId = rooms[roomID].interviewee;
 
-      io.to(intervieweeSocketId).emit("answerStart");
+      io.to(intervieweeSocketId).emit("startAnswer");
+    });
+
+    socket.on("endAnswer", () => {
+      const roomID = socketToRoom[socket.id];
+
+      if (!checkRoomExists(roomID, socket)) {
+        return;
+      }
+
+      if (!checkIntervieweeExists(roomID, socket)) {
+        return;
+      }
+
+      if (!checkQuestionerExists(roomID, socket)) {
+        return;
+      }
+
+      const intervieweeSocketId = rooms[roomID].interviewee;
+
+      io.to(intervieweeSocketId).emit("endAnswer");
     });
   });
 
@@ -122,6 +144,14 @@ module.exports = ({ app }) => {
     return true;
   }
 
+  function checkQuestionerExists(roomID, socket) {
+    if (!rooms[roomID].questioner) {
+      io.to(socket.id).emit("error", { message: "questioner is not exist" });
+      return false;
+    }
+
+    return true;
+  }
 
   app.io = io;
 };
