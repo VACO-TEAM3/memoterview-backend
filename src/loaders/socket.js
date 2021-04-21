@@ -28,16 +28,13 @@ module.exports = ({ app }) => {
       const targetUsers = rooms[roomID].members.filter((member) => member.socketID !== socket.id);
 
       socket.emit("successJoinUser", targetUsers);
-      console.log(socket.id);
     });
 
     socket.on("sendSignal", ({ callee, caller, signal }) => {
-      console.log("sendSignal")
       io.to(callee).emit("joinNewUser", { signal, caller });
     });
 
     socket.on("returnSignal", ({ signal, caller }) => {
-      console.log("returnSignal");
       io.to(caller).emit("receiveReturnSignal", { signal, id: socket.id });
     });
 
@@ -45,21 +42,21 @@ module.exports = ({ app }) => {
       socket.broadcast.emit("userLeft");
       const roomID = socketToRoom[socket.id];
 
-      const leftUsers = rooms[roomID].members.filter(
+      const leftUsers = rooms[roomID]?.members.filter(
         (member) => member.socketID !== socket.id
       );
 
-      delete users[socket.id];
-
-      if (leftUsers.length === 0) {
+      if (leftUsers?.length !== 0) {
+        if (rooms[roomID]) {
+          rooms[roomID].members = leftUsers;
+        }
+      } else {
         delete rooms[roomID];
-
-        return;
       }
 
-      rooms[roomID].members = leftUsers;
+      delete users[socket.id];
 
-      socket.emit("SuccessToLeave");
+      socket.emit("successToLeave");
     });
   });
 
