@@ -27,7 +27,10 @@ exports.getInterviewee = async (intervieweeId) => {
 
 exports.getInterviewees = async (projectId) => {
   try {
-    const { candidates } = await Project.findOne({ _id: projectId }).populate("candidates").lean();
+    const { candidates } = await Project
+      .findOne({ _id: projectId })
+      .populate("candidates")
+      .lean();
 
     return { candidates };
   } catch (error) {
