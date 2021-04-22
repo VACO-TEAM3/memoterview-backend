@@ -125,7 +125,7 @@ router.post(
       // TO-DO : Handling session for Model.Create()
       // TO-DO : Validate transaction through intentional mistakes
       const newInterviewee = await createInterviewee({ email, name, resumeUrl }, session);
-      console.log(newInterviewee, "inter");
+
       await addCandidateToProject(projectId, newInterviewee._id, session);
 
       await session.commitTransaction();
@@ -143,22 +143,6 @@ router.post(
     }
   }
 );
-
-// router.get(
-//   "/:project_id/:interviewee_id",
-//   async (req, res, next) => {
-//     try {
-//       const intervieweeId = req.params.interviewee_id;
-//       const { interviewee } = await getInterviewee(intervieweeId);
-
-//       return res.json({
-//         url: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${interviewee.resumePath}`,
-//       });
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-// );
 
 router.delete(
   "/:project_id",
