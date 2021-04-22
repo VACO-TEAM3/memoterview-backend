@@ -1,6 +1,20 @@
 const Interviewee = require("../models/Interviewee");
 const Project = require("../models/Project");
 
+exports.createInterviewee = async ({ email, name, key }) => {
+  try {
+    const { _id } = await Interviewee.create({
+      email,
+      name,
+      resumePath: key,
+    }); // todo. session 넣기
+
+    return { _id };
+  } catch (error) {
+    return { error };
+  }
+};
+
 exports.deleteInterviewees = async ({ intervieweeIds }, session) => {
   try {
     const deletedIntervieweesResult = await Interviewee.deleteMany({
