@@ -66,6 +66,7 @@ router.post(
       });
     } catch (error) {
       await session.abortTransaction();
+
       session.endSession();
       next(error);
     }
@@ -80,7 +81,7 @@ router.get(
       const { candidates } = await getInterviewees(projectId);
 
       const intervieweeList = candidates.map(interviewee => ({
-        _id: interviewee._id,
+        _id: interviewee.id,
         name: interviewee.name,
         email: interviewee.email,
         interviewDate: interviewee.createdAt,
@@ -107,6 +108,7 @@ router.post(
   upload.single("pdf"),
   async (req, res, next) => {
     const session = await startSession();
+
     try {
       session.startTransaction();
       const { project_id: projectId } = req.params;
@@ -116,6 +118,7 @@ router.post(
       const { key } = await uploadFileToS3(file);
 
       const unlinkFile = util.promisify(fs.unlink);
+
       await unlinkFile(file.path);
 
       // TO-DO : Handling session for Model.Create()
@@ -132,23 +135,8 @@ router.post(
       });
     } catch (error) {
       await session.abortTransaction();
+
       session.endSession();
-      next(error);
-    }
-  }
-);
-
-router.get(
-  "/:project_id/:interviewee_id",
-  async (req, res, next) => {
-    try {
-      const intervieweeId = req.params.interviewee_id;
-      const { interviewee } = await getInterviewee(intervieweeId);
-
-      return res.json({
-        url: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${interviewee.resumePath}`,
-      });
-    } catch (error) {
       next(error);
     }
   }
@@ -183,6 +171,7 @@ router.delete(
       });
     } catch (error) {
       await session.abortTransaction();
+
       session.endSession();
       next(error);
     }
