@@ -55,7 +55,6 @@ exports.getInterviewees = async (projectId) => {
 exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
   try {
     const intervieweeData = await Interviewee.findOne({ _id: intervieweeId });
-
     Object.keys(interviewee.filterScores).forEach((key) => {
       if (!intervieweeData.filterScores[key]) {
         intervieweeData.filterScores[key] = [];
