@@ -12,6 +12,7 @@ const {
   addToJoinedProjects,
   addCandidateToProject,
   deleteProjects,
+  updateInterviewRoom,
 } = require("../../services/projectService");
 const validate = require("../middlewares/validate");
 const { deleteProjectOnMyProjects, deleteProjectOnJoinedProjects } = require("../../services/interviewerService");
@@ -41,6 +42,7 @@ router.post(
           creator,
           participants,
           title,
+          isOpened,
           filters,
           candidates,
           createdAt,
@@ -60,6 +62,7 @@ router.post(
           title,
           filters,
           creator,
+          isOpened,
           participants,
           createAt: createdAt,
           candidateNum: candidates.length,
@@ -74,11 +77,47 @@ router.post(
   }
 );
 
+router.patch(
+  "/:project_id", // need validation
+  async (req, res, next) => {
+    try {
+      const { projectId, roomState } = req.body;
+      const { 
+        project: {
+          _id,
+          creator,
+          participants,
+          title,
+          filters,
+          isOpened,
+          candidates,
+          createdAt,
+        },
+      } = await updateInterviewRoom(projectId, roomState);
+      console.log(isOpened);
+      return res.json({
+        result: "ok",
+        data: {
+          id: _id,
+          title,
+          filters,
+          creator,
+          isOpened,
+          participants,
+          createAt: createdAt,
+          candidateNum: candidates.length,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 router.get(
   "/:project_id/interviewees",
   async (req, res, next) => {
     try {
-      console.log(req.params);
       const projectId = req.params.project_id;
       console.log(projectId);
       const { candidates } = await getInterviewees(projectId);
