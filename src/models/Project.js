@@ -26,6 +26,10 @@ const projectSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
+  isOpened: {
+    type: Boolean,
+    default: false,
+  },
   participants: {
     type: [{
       type: mongoose.Schema.Types.ObjectId,
