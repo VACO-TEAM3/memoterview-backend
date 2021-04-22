@@ -16,7 +16,8 @@
       "60791ee9e0c69fffe5c0ca8a",
       "60791ee94bd456182dd01939",
       "60791ee9fdd54fc95fa1e22b"
-    ]
+    ],
+    "isOpened": true
   },
   {
     "title": "Hayes",
@@ -40,7 +41,8 @@
       "60791ee95347f6c04b96200a",
       "60791ee91fb4e9b9ee234a46",
       "60791ee98f1a8f033bb10ec1"
-    ]
+    ],
+    "isOpened": true
   },
   {
     "title": "Riviera",
@@ -56,7 +58,8 @@
     "participants": [
       "60791ee92e598c435fd2b11f",
       "60791ee993e87b16f1e720e2"
-    ]
+    ],
+    "isOpened": false
   },
   {
     "title": "Linwood",
@@ -80,7 +83,8 @@
       "60791ee9cc4e2bc89a02081e",
       "60791ee97fd7c6094429e4df",
       "60791ee952170983358f3a72"
-    ]
+    ],
+    "isOpend": false
   },
   {
     "title": "Sparkill",
@@ -99,7 +103,8 @@
       "60791ee92a489ddce725d4bd",
       "60791ee994fbc95800836acd",
       "60791ee97cee91ade91d4f18"
-    ]
+    ],
+    "isOpened": false
   },
   {
     "title": "Como",
@@ -120,7 +125,8 @@
       "60791ee96ff44200c5319df5",
       "60791ee943d244bff3bb2a11",
       "60791ee9d46b2046d4bc8a7a"
-    ]
+    ],
+    "isOpened": false
   },
   {
     "title": "Franklin",
@@ -134,7 +140,8 @@
     "filters": [],
     "participants": [
       "60791ee9dee3297756d3d9ee"
-    ]
+    ],
+    "isOpened": false
   },
   {
     "title": "Strykersville",
@@ -152,7 +159,8 @@
       "60791ee95581f47e501d9692",
       "60791ee98c4ab91e3dcba2c0",
       "60791ee943e727764c687df2"
-    ]
+    ],
+    "isOpened": false
   },
   {
     "title": "Echo",
@@ -172,6 +180,7 @@
     "participants": [
       "60791ee9a45f2d4cf43d15f4",
       "60791ee9d7add06f30f5a9d4"
-    ]
+    ],
+    "isOpened": false
   }
 ]
