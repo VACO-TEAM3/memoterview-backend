@@ -48,6 +48,20 @@ exports.addToJoinedProjects = async (participants, _id, session) => {
   }
 };
 
+exports.addCandidateToProject = async (projectId, _id, session) => {
+  try {
+    const updatedProject = await Project.findByIdAndUpdate(
+      projectId,
+      { $push: { candidates: _id } },
+      { upsert: true, new: true }
+    ).session(session);
+
+    return { updatedProject };
+  } catch (error) {
+    return { addToCandidatesError: error };
+  }
+};
+
 exports.getMyProjects = async (interviewerId) => {
   try {
     const { myProjects } = await Interviewer.findOne({ _id: interviewerId })
