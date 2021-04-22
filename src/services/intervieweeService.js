@@ -51,3 +51,31 @@ exports.getInterviewees = async (projectId) => {
     return { error };
   }
 };
+
+exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
+  try {
+    const intervieweeData = await Interviewee.findOne({ _id: intervieweeId });
+
+    Object.keys(interviewee.filterScores).forEach((key) => {
+      if (!intervieweeData.filterScores[key]) {
+        intervieweeData.filterScores[key] = [];
+      }
+
+      intervieweeData.filterScores[key].push(interviewee.filterScores[key]);
+    });
+
+    const updatedInterviewee =  await Interviewee.findByIdAndUpdate(intervieweeId, {
+      $push: {
+        questions: { $each: interviewee.questions },
+        comments: { $each: interviewee.comments },
+      },
+      $set: {
+        filterScores: { ...intervieweeData.filterScores },
+      },
+    }, { new: true });
+    
+    return { intervieweeData: updatedInterviewee };
+  } catch (error) {
+    return { error };
+  }
+};

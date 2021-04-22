@@ -24,7 +24,6 @@ const questionSchema = new mongoose.Schema({
   },
   score: {
     type: Number,
-    default: 0,
   },
   questioner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -48,6 +47,7 @@ const intervieweeSchema = new mongoose.Schema({
   },
   filterScores: {
     type: mongoose.Schema.Types.Mixed,
+    default: {},
   },
   questions: [questionSchema],
   comments: [commentSchema],
