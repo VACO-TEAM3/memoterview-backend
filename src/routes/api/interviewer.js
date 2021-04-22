@@ -41,6 +41,8 @@ router.get(
   }
 );
 
+
+
 router.get(
   "/:user_id/joined_projects",
   validate(userIdParamsSchema, "params"),
