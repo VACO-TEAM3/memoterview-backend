@@ -1,5 +1,6 @@
 const express = require("express");
 const { startSession } = require("mongoose");
+const config = require("../../config");
 
 const multer = require("multer");
 const util = require("util");
@@ -116,22 +117,23 @@ router.post(
       const file = req.file;
 
       const { key } = await uploadFileToS3(file);
-
+      const resumeUrl = `https://${config.AWS_BUCKET_NAME}.s3.${config.AWS_REGION}.amazonaws.com/${key}`;
       const unlinkFile = util.promisify(fs.unlink);
 
       await unlinkFile(file.path);
 
       // TO-DO : Handling session for Model.Create()
       // TO-DO : Validate transaction through intentional mistakes
-      const { _id } = await createInterviewee({ email, name, key }, session);
+      const newInterviewee = await createInterviewee({ email, name, resumeUrl }, session);
 
-      await addCandidateToProject(projectId, _id, session);
+      await addCandidateToProject(projectId, newInterviewee._id, session);
 
       await session.commitTransaction();
       session.endSession();
 
       return res.json({
         result: "ok",
+        data: newInterviewee,
       });
     } catch (error) {
       await session.abortTransaction();
@@ -141,6 +143,22 @@ router.post(
     }
   }
 );
+
+// router.get(
+//   "/:project_id/:interviewee_id",
+//   async (req, res, next) => {
+//     try {
+//       const intervieweeId = req.params.interviewee_id;
+//       const { interviewee } = await getInterviewee(intervieweeId);
+
+//       return res.json({
+//         url: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${interviewee.resumePath}`,
+//       });
+//     } catch (error) {
+//       next(error);
+//     }
+//   }
+// );
 
 router.delete(
   "/:project_id",
