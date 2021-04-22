@@ -1,16 +1,24 @@
 const express = require("express");
 const { startSession } = require("mongoose");
 
+const multer = require("multer");
+const util = require("util");
+const fs = require("fs");
+
 const { createProjectBodySchema, projectIdParamsSchema } = require("../../utils/validationSchema");
 const {
   createProject,
   addToMyProjects,
   addToJoinedProjects,
+  addCandidateToProject,
   deleteProjects,
 } = require("../../services/projectService");
 const validate = require("../middlewares/validate");
 const { deleteProjectOnMyProjects, deleteProjectOnJoinedProjects } = require("../../services/interviewerService");
-const { deleteInterviewees, getInterviewees } = require("../../services/intervieweeService");
+const { deleteInterviewees, getInterviewees, createInterviewee } = require("../../services/intervieweeService");
+
+const { uploadFileToS3 } = require("../../loaders/s3");
+const upload = multer({ dest: "uploads/" });
 
 const router = express.Router();
 
@@ -91,6 +99,46 @@ router.get(
     }
   }
 );
+
+router.post(
+  "/:project_id/interviewee",
+  validate(projectIdParamsSchema, "params"),
+  // TO-DO: validation form data
+  upload.single("pdf"),
+  async (req, res, next) => {
+    const session = await startSession();
+    try {
+      session.startTransaction();
+      const { project_id: projectId } = req.params;
+      const { name, email } = req.body;
+      const file = req.file;
+
+      const { key } = await uploadFileToS3(file);
+
+      const unlinkFile = util.promisify(fs.unlink);
+      await unlinkFile(file.path);
+
+      // TO-DO : Handling session for Model.Create()
+      // TO-DO : Validate transaction through intentional mistakes
+      const { _id } = await createInterviewee({ email, name, key }, session);
+
+      await addCandidateToProject(projectId, _id, session);
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return res.json({
+        result: "ok",
+      });
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      next(error);
+    }
+  }
+);
+
+
 
 router.delete(
   "/:project_id",
