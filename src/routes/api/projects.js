@@ -5,7 +5,7 @@ const multer = require("multer");
 const util = require("util");
 const fs = require("fs");
 
-const { createProjectBodySchema, projectIdParamsSchema } = require("../../utils/validationSchema");
+const { createProjectBodySchema, projectIdParamsSchema, updateRoomStateBodySchema } = require("../../utils/validationSchema");
 const {
   createProject,
   addToMyProjects,
@@ -79,7 +79,9 @@ router.post(
 
 router.patch(
   "/:project_id", // need validation
+  validate(updateRoomStateBodySchema, "body"),
   async (req, res, next) => {
+    console.log(req.body);
     try {
       const { projectId, roomState } = req.body;
       const { 
