@@ -1,15 +1,15 @@
 const Interviewee = require("../models/Interviewee");
 const Project = require("../models/Project");
 
-exports.createInterviewee = async ({ email, name, key }) => {
+exports.createInterviewee = async ({ email, name, resumeUrl }) => {
   try {
-    const { _id } = await Interviewee.create({
+    const newInterviewee = await Interviewee.create({
       email,
       name,
-      resumePath: key,
+      resumePath: resumeUrl,
     }); // todo. session 넣기
 
-    return { _id };
+    return newInterviewee;
   } catch (error) {
     return { error };
   }
