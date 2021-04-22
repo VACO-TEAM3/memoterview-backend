@@ -15,6 +15,16 @@ exports.deleteInterviewees = async ({ intervieweeIds }, session) => {
   }
 };
 
+exports.getInterviewee = async (intervieweeId) => {
+  try {
+    const interviewee = await Interviewee.findOne({ _id: intervieweeId });
+
+    return { interviewee };
+  } catch (error) {
+    return { error };
+  }
+};
+
 exports.getInterviewees = async (projectId) => {
   try {
     const { candidates } = await Project.findOne({ _id: projectId }).populate("candidates").lean();

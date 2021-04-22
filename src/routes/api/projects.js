@@ -15,7 +15,7 @@ const {
 } = require("../../services/projectService");
 const validate = require("../middlewares/validate");
 const { deleteProjectOnMyProjects, deleteProjectOnJoinedProjects } = require("../../services/interviewerService");
-const { deleteInterviewees, getInterviewees, createInterviewee } = require("../../services/intervieweeService");
+const { deleteInterviewees, getInterviewees, createInterviewee, getInterviewee } = require("../../services/intervieweeService");
 
 const { uploadFileToS3 } = require("../../loaders/s3");
 const upload = multer({ dest: "uploads/" });
@@ -138,7 +138,21 @@ router.post(
   }
 );
 
+router.get(
+  "/:project_id/:interviewee_id",
+  async (req, res, next) => {
+    try {
+      const intervieweeId = req.params.interviewee_id;
+      const { interviewee } = await getInterviewee(intervieweeId);
 
+      return res.json({
+        url: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${interviewee.resumePath}`,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 router.delete(
   "/:project_id",
