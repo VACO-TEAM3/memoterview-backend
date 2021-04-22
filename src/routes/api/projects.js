@@ -10,7 +10,7 @@ const {
 } = require("../../services/projectService");
 const validate = require("../middlewares/validate");
 const { deleteProjectOnMyProjects, deleteProjectOnJoinedProjects } = require("../../services/interviewerService");
-const { deleteInterviewees } = require("../../services/intervieweeService");
+const { deleteInterviewees, getInterviewees } = require("../../services/intervieweeService");
 
 const router = express.Router();
 
@@ -59,6 +59,34 @@ router.post(
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
+      next(error);
+    }
+  }
+);
+
+router.get(
+  "/:project_id/interviewees",
+  async (req, res, next) => {
+    try {
+      const projectId = req.params.project_id;
+      const { candidates } = await getInterviewees(projectId);
+
+      const intervieweeList = candidates.map(interviewee => ({
+        _id: interviewee._id,
+        name: interviewee.name,
+        email: interviewee.email,
+        interviewDate: interviewee.createdAt,
+        filterScores: interviewee.filterScores,
+        isInterviewed: interviewee.isInterviewed,
+        question: interviewee.question,
+        resumePath: interviewee.resumePath,
+      }));
+
+      return res.json({
+        result: "ok",
+        data: intervieweeList,
+      });
+    } catch (error) {
       next(error);
     }
   }
