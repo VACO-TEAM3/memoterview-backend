@@ -16,7 +16,12 @@ const {
 } = require("../../services/projectService");
 const validate = require("../middlewares/validate");
 const { deleteProjectOnMyProjects, deleteProjectOnJoinedProjects } = require("../../services/interviewerService");
-const { deleteInterviewees, getInterviewees, createInterviewee } = require("../../services/intervieweeService");
+const {
+  deleteInterviewees,
+  getInterviewees,
+  createInterviewee,
+  updateInterviewee,
+} = require("../../services/intervieweeService");
 const { generateResumeUrl } = require("../../utils/generateResumeUrl");
 
 const { uploadFileToS3 } = require("../../loaders/s3");
@@ -81,7 +86,6 @@ router.patch(
   "/:project_id", // need validation
   validate(updateRoomStateBodySchema, "body"),
   async (req, res, next) => {
-    console.log(req.body);
     try {
       const { projectId, roomState } = req.body;
       const { 
@@ -96,7 +100,7 @@ router.patch(
           createdAt,
         },
       } = await updateInterviewRoom(projectId, roomState);
-      console.log(isOpened);
+
       return res.json({
         result: "ok",
         data: {
@@ -221,5 +225,43 @@ router.delete(
     }
   }
 );
+
+router.patch(
+  "/:project_id/interviewees/:interviewee_id",
+  async (req, res, next) => {
+    try {
+      const { intervieweeId, interviewee } = req.body; // project Id 있음
+      const { 
+        intervieweeData: {
+          _id,
+          email,
+          name,
+          resumePath,
+          questions,
+          comments,
+          isInterviewed,
+          filterScores,
+        },
+      } = await updateInterviewee({ intervieweeId, interviewee });
+      
+      return res.json({ 
+        data: {
+          id: _id,
+          email,
+          name,
+          resumePath,
+          questions,
+          comments,
+          isInterviewed,
+          filterScores,
+        },
+        result: "ok", 
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 
 module.exports = router;
