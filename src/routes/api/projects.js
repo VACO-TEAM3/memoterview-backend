@@ -117,7 +117,7 @@ router.post(
       const file = req.file;
 
       const { key } = await uploadFileToS3(file);
-      const resumeUrl = `https://${config.AWS_BUCKET_NAME}.s3.${config.AWS_REGION}.amazonaws.com/${key}`;
+      const resumeUrl = `https://${config.s3.bucketName}.s3.${config.s3.region}.amazonaws.com/${key}`;
       const unlinkFile = util.promisify(fs.unlink);
 
       await unlinkFile(file.path);
@@ -125,7 +125,7 @@ router.post(
       // TO-DO : Handling session for Model.Create()
       // TO-DO : Validate transaction through intentional mistakes
       const newInterviewee = await createInterviewee({ email, name, resumeUrl }, session);
-
+      console.log(newInterviewee, "inter");
       await addCandidateToProject(projectId, newInterviewee._id, session);
 
       await session.commitTransaction();
