@@ -48,12 +48,12 @@ module.exports = ({ app }) => {
       socket.broadcast.emit("userLeft");
       const roomID = socketToRoom[socket.id];
 
-      const leftUsers = rooms[roomID]?.members.filter(
+      const leftUsers = rooms[roomID].members.filter(
         (member) => member.socketID !== socket.id
       );
 
-      if (leftUsers?.length !== 0) {
-        if (rooms[roomID]?.members) {
+      if (leftUsers.length !== 0) {
+        if (rooms[roomID].members) {
           rooms[roomID].members = leftUsers;
         }
       } else {
