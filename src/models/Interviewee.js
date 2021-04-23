@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const commentSchema = new mongoose.Schema({
   comment: {
     type: String,
@@ -14,7 +13,6 @@ const commentSchema = new mongoose.Schema({
     ref: "Interviewer",
   },
 }, { _id: false });
-
 const questionSchema = new mongoose.Schema({
   question: {
     type: String,
@@ -33,7 +31,6 @@ const questionSchema = new mongoose.Schema({
     ref: "Interviewer",
   },
 }, { _id: false });
-
 const intervieweeSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -50,17 +47,13 @@ const intervieweeSchema = new mongoose.Schema({
     type: String,
   },
   filterScores: {
-    type: [{
-      type: Number,
-    }],
-    default: [],
+    type: mongoose.Schema.Types.Mixed,
   },
-  question: [questionSchema],
+  questions: [questionSchema],
   comments: [commentSchema],
   isInterviewed: {
     type: Boolean,
     default: false,
   },
 }, { timestamps: true });
-
 module.exports = mongoose.model("Interviewee", intervieweeSchema);

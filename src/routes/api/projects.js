@@ -1,6 +1,5 @@
 const express = require("express");
 const { startSession } = require("mongoose");
-const config = require("../../config");
 
 const multer = require("multer");
 const util = require("util");
@@ -16,7 +15,8 @@ const {
 } = require("../../services/projectService");
 const validate = require("../middlewares/validate");
 const { deleteProjectOnMyProjects, deleteProjectOnJoinedProjects } = require("../../services/interviewerService");
-const { deleteInterviewees, getInterviewees, createInterviewee, getInterviewee } = require("../../services/intervieweeService");
+const { deleteInterviewees, getInterviewees, createInterviewee } = require("../../services/intervieweeService");
+const { generateResumeUrl } = require("../../utils/generateResumeUrl");
 
 const { uploadFileToS3 } = require("../../loaders/s3");
 const upload = multer({ dest: "uploads/" });
@@ -81,8 +81,8 @@ router.get(
       const projectId = req.params.project_id;
       const { candidates } = await getInterviewees(projectId);
 
-      const intervieweeList = candidates.map(interviewee => ({
-        _id: interviewee.id,
+      const intervieweeList = candidates.map((interviewee) => ({
+        id: interviewee._id,
         name: interviewee.name,
         email: interviewee.email,
         interviewDate: interviewee.createdAt,
@@ -117,7 +117,7 @@ router.post(
       const file = req.file;
 
       const { key } = await uploadFileToS3(file);
-      const resumeUrl = `https://${config.s3.bucketName}.s3.${config.s3.region}.amazonaws.com/${key}`;
+      const resumeUrl = generateResumeUrl(key);
       const unlinkFile = util.promisify(fs.unlink);
 
       await unlinkFile(file.path);
