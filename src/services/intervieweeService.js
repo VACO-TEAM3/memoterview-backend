@@ -54,8 +54,15 @@ exports.getInterviewees = async (projectId) => {
   try {
     const { candidates } = await Project
       .findOne({ _id: projectId })
-      .populate("candidates")
-      .lean();
+      .populate({
+        path: "candidates",
+        populate: {
+          path: "comments",
+          populate: {
+            path: "commenter",
+          },
+        },
+      });
 
     return { candidates };
   } catch (error) {
@@ -89,7 +96,6 @@ exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
       },
       { new: true }
     );
-
     return { intervieweeData: updatedInterviewee };
   } catch (error) {
     return { error };
