@@ -27,9 +27,9 @@ const {
   deleteProjectOnJoinedProjects,
 } = require("../../services/interviewerService");
 const {
+  getInterviewee,
   deleteInterviewees,
   getInterviewees,
-  getInterviewee,
   createInterviewee,
   updateInterviewee,
   deleteInterviewee,
