@@ -96,3 +96,31 @@ exports.deleteProjects = async (projectId, session) => {
     return { deleteProjectsError: error };
   }
 };
+
+exports.updateInterviewRoom = async (projectId, isOpened) => {
+  try {
+    const project = await Project.findByIdAndUpdate(
+      projectId, 
+      { isOpened },
+      { new: true }
+    );
+
+    return { project };
+  } catch (error) {
+    return { updateInterviewRoom: error };
+  }
+};
+
+exports.deleteCandidate = async ({ projectId, intervieweeId }, session) => {
+  try {
+    const deletedCandidates = await Project.findByIdAndUpdate(
+      projectId,
+      { $pull: { candidates: intervieweeId } },
+      { safe: true, upsert: true }
+    ).session(session);
+
+    return { deletedCandidates };
+  } catch (error) {
+    return { error };
+  }
+};
