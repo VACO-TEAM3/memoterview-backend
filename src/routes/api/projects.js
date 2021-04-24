@@ -21,7 +21,6 @@ const {
   deleteProjects,
   deleteCandidate,
 } = require("../../services/projectService");
-const validate = require("../middlewares/validate");
 const {
   deleteProjectOnMyProjects,
   deleteProjectOnJoinedProjects,
@@ -35,6 +34,7 @@ const {
   deleteInterviewee,
   updateInterviewRoom,
 } = require("../../services/intervieweeService");
+const validate = require("../middlewares/validate");
 const { generateResumeUrl } = require("../../utils/generateResumeUrl");
 const { uploadFileToS3 } = require("../../loaders/s3");
 const { sendInviteEmail } = require("../../services/mailService");
@@ -51,7 +51,6 @@ router.post(
     try {
       session.startTransaction();
       const project = req.body;
-
       // TO-DO : Handling session for Model.Create()
       // TO-DO : Validate transaction through intentional mistakes
       const {
@@ -132,7 +131,9 @@ router.post(
       const file = req.file;
 
       const { key } = await uploadFileToS3(file);
+
       const resumeUrl = generateResumeUrl(key);
+
       const unlinkFile = util.promisify(fs.unlink);
 
       await unlinkFile(file.path);
