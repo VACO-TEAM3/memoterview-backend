@@ -13,7 +13,8 @@ const {
   createProjectBodySchema,
   projectIdParamsSchema,
   updateRoomStateBodySchema,
-  sendInvitingEmailSchema,
+  sendInvitingEmailBodySchema,
+  intervieweeIdParamsSchema,
 } = require("../../utils/validationSchema");
 const {
   createProject,
@@ -22,6 +23,7 @@ const {
   addCandidateToProject,
   deleteProjects,
   updateInterviewRoom,
+  deleteCandidate,
 } = require("../../services/projectService");
 const validate = require("../middlewares/validate");
 const {
@@ -34,6 +36,7 @@ const {
   getInterviewee,
   createInterviewee,
   updateInterviewee,
+  deleteInterviewee,
 } = require("../../services/intervieweeService");
 const { generateResumeUrl } = require("../../utils/generateResumeUrl");
 
@@ -303,7 +306,7 @@ router.patch(
 
 router.post(
   "/:project_id/interviewees/:interviewee_id/invite",
-  validate(sendInvitingEmailSchema, "body"),
+  validate(sendInvitingEmailBodySchema, "body"),
   async (req, res, next) => {
     const { userEmail, welcomePageLink } = req.body;
 
@@ -331,6 +334,38 @@ router.post(
       info,
       message: "Sent Email",
     });
+  }
+);
+
+router.delete(
+  ":project_id/interviewees/:interviewee_id",
+  validate(projectIdParamsSchema, "params"),
+  validate(intervieweeIdParamsSchema, "params"),
+  async (req, res, next) => {
+    const session = await startSession();
+
+    try {
+      session.startTransaction();
+      const { project_id: projectId, interviewee_id: intervieweeId } = req.params;
+
+      const { deletedInterviewee } = await deleteInterviewee(intervieweeId, session);
+
+      await deleteCandidate(({ projectId, intervieweeId }, session));
+
+      await session.commitTransaction();
+
+      session.endSession();
+
+      return res.json({
+        result: "ok",
+        data: deletedInterviewee,
+      });
+    } catch (error) {
+      await session.abortTransaction();
+
+      session.endSession();
+      next(error);
+    }
   }
 );
 
