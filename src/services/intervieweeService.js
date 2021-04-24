@@ -8,7 +8,6 @@ exports.createInterviewee = async ({ email, name, resumeUrl }) => {
       name,
       resumePath: resumeUrl,
     }); // todo. session 넣기
-
     return newInterviewee;
   } catch (error) {
     return { error };
@@ -50,6 +49,7 @@ exports.getInterviewee = async (intervieweeId) => {
   }
 };
 
+// 상의하기 -> 흐름, 형태 맞는지?
 exports.getInterviewees = async (projectId) => {
   try {
     const { candidates } = await Project
