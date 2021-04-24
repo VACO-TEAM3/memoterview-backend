@@ -39,3 +39,8 @@ exports.intervieweeQuestionSchema = Joi.object({
     score: Joi.number().required(),
   },
 });
+
+exports.sendInvitingEmailSchema = Joi.object({
+  userEmail: Joi.string().email().required(),
+  welcomePageLink: Joi.string().required(),
+});
