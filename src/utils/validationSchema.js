@@ -40,7 +40,11 @@ exports.intervieweeQuestionSchema = Joi.object({
   },
 });
 
-exports.sendInvitingEmailSchema = Joi.object({
+exports.sendInvitingEmailBodySchema = Joi.object({
   userEmail: Joi.string().email().required(),
   welcomePageLink: Joi.string().required(),
+});
+
+exports.intervieweeIdParamsSchema = Joi.object({
+  interviewee_id: Joi.string().required(),
 });
