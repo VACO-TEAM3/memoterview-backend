@@ -1,11 +1,20 @@
 const express = require("express");
 const { startSession } = require("mongoose");
-
 const multer = require("multer");
 const util = require("util");
 const fs = require("fs");
+const nodemailer = require("nodemailer");
 
-const { createProjectBodySchema, projectIdParamsSchema, updateRoomStateBodySchema } = require("../../utils/validationSchema");
+const {
+  mailing: { gmail },
+} = require("../../config");
+
+const {
+  createProjectBodySchema,
+  projectIdParamsSchema,
+  updateRoomStateBodySchema,
+  sendInvitingEmailSchema,
+} = require("../../utils/validationSchema");
 const {
   createProject,
   addToMyProjects,
@@ -15,16 +24,21 @@ const {
   updateInterviewRoom,
 } = require("../../services/projectService");
 const validate = require("../middlewares/validate");
-const { deleteProjectOnMyProjects, deleteProjectOnJoinedProjects } = require("../../services/interviewerService");
+const {
+  deleteProjectOnMyProjects,
+  deleteProjectOnJoinedProjects,
+} = require("../../services/interviewerService");
 const {
   deleteInterviewees,
   getInterviewees,
+  getInterviewee,
   createInterviewee,
   updateInterviewee,
 } = require("../../services/intervieweeService");
 const { generateResumeUrl } = require("../../utils/generateResumeUrl");
 
 const { uploadFileToS3 } = require("../../loaders/s3");
+const mailConstant = require("../../config/inviteMailing");
 const upload = multer({ dest: "uploads/" });
 
 const router = express.Router();
@@ -88,7 +102,7 @@ router.patch(
   async (req, res, next) => {
     try {
       const { projectId, roomState } = req.body;
-      const { 
+      const {
         project: {
           _id,
           creator,
@@ -120,36 +134,32 @@ router.patch(
   }
 );
 
-router.get(
-  "/:project_id/interviewees",
-  async (req, res, next) => {
-    try {
-      console.log(req.params);
-      const projectId = req.params.project_id;
-      const { candidates } = await getInterviewees(projectId);
-      const intervieweeList = candidates.map((interviewee) => ({
-        id: interviewee._id,
-        name: interviewee.name,
-        email: interviewee.email,
-        interviewDate: interviewee.createdAt,
-        filterScores: interviewee.filterScores,
-        isInterviewed: interviewee.isInterviewed,
-        question: interviewee.question,
-        resumePath: interviewee.resumePath,
-      }));
+router.get("/:project_id/interviewees", async (req, res, next) => {
+  try {
+    const projectId = req.params.project_id;
+    const { candidates } = await getInterviewees(projectId);
+    const intervieweeList = candidates.map((interviewee) => ({
+      id: interviewee._id,
+      name: interviewee.name,
+      email: interviewee.email,
+      interviewDate: interviewee.createdAt,
+      filterScores: interviewee.filterScores,
+      isInterviewed: interviewee.isInterviewed,
+      question: interviewee.question,
+      resumePath: interviewee.resumePath,
+    }));
 
-      return res.json({
-        result: "ok",
-        data: intervieweeList,
-      });
-    } catch (error) {
-      next(error);
-    }
+    return res.json({
+      result: "ok",
+      data: intervieweeList,
+    });
+  } catch (error) {
+    next(error);
   }
-);
+});
 
 router.post(
-  "/:project_id/interviewee",
+  "/:project_id/interviewees",
   validate(projectIdParamsSchema, "params"),
   // TO-DO: validation form data
   upload.single("pdf"),
@@ -170,7 +180,10 @@ router.post(
 
       // TO-DO : Handling session for Model.Create()
       // TO-DO : Validate transaction through intentional mistakes
-      const newInterviewee = await createInterviewee({ email, name, resumeUrl }, session);
+      const newInterviewee = await createInterviewee(
+        { email, name, resumeUrl },
+        session
+      );
 
       await addCandidateToProject(projectId, newInterviewee._id, session);
 
@@ -179,12 +192,27 @@ router.post(
 
       return res.json({
         result: "ok",
-        data: newInterviewee,
+        data: {
+          id: newInterviewee._id,
+          name: newInterviewee.name,
+          email: newInterviewee.email,
+          interviewDate: newInterviewee.createdAt,
+          filterScores: newInterviewee.filterScores,
+          isInterviewed: newInterviewee.isInterviewed,
+          question: newInterviewee.question,
+          resumePath: newInterviewee.resumePath,
+        },
       });
     } catch (error) {
       await session.abortTransaction();
 
-router.get(//validation 필요
+      session.endSession();
+    }
+  }
+);
+
+router.get(
+  //validation 필요
   "/:project_id/:interviewee_id",
   async (req, res, next) => {
     try {
@@ -241,7 +269,7 @@ router.patch(
   async (req, res, next) => {
     try {
       const { intervieweeId, interviewee } = req.body; // project Id 있음
-      const { 
+      const {
         intervieweeData: {
           _id,
           email,
@@ -253,8 +281,8 @@ router.patch(
           filterScores,
         },
       } = await updateInterviewee({ intervieweeId, interviewee });
-      
-      return res.json({ 
+
+      return res.json({
         data: {
           id: _id,
           email,
@@ -265,7 +293,7 @@ router.patch(
           isInterviewed,
           filterScores,
         },
-        result: "ok", 
+        result: "ok",
       });
     } catch (error) {
       next(error);
@@ -273,5 +301,37 @@ router.patch(
   }
 );
 
+router.post(
+  "/:project_id/interviewees/:interviewee_id/invite",
+  validate(sendInvitingEmailSchema, "body"),
+  async (req, res, next) => {
+    const { userEmail, welcomePageLink } = req.body;
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail", //사용하고자 하는 서비스
+      prot: 587,
+      host: "smtp.gmlail.com",
+      secure: false,
+      requireTLS: true,
+      auth: {
+        user: gmail.user, //gmail주소입력
+        pass: gmail.password, //gmail패스워드 입력
+      },
+    });
+
+    const info = await transporter.sendMail({
+      from: gmail.user, //보내는 주소 입력
+      to: userEmail, //위에서 선언해준 받는사람 이메일
+      subject: mailConstant.subject, //메일 제목
+      text: mailConstant.makeInviteMailText(welcomePageLink), //내용
+    });
+
+    res.json({
+      result: "ok",
+      info,
+      message: "Sent Email",
+    });
+  }
+);
 
 module.exports = router;
