@@ -17,6 +17,12 @@ module.exports = {
     accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
     accessTokenExpiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
   },
+  mailing: {
+    gmail: {
+      user: process.env.GOOGLE_MAIL_ID,
+      password: process.env.GOOGLE_MAIL_PASSWORD,
+    },
+  },
 };
 
 function normalizePort(val) {
