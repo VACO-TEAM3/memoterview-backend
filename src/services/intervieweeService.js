@@ -29,6 +29,17 @@ exports.deleteInterviewees = async ({ intervieweeIds }, session) => {
   }
 };
 
+exports.deleteInterviewee = async ({ intervieweeId }, session) => {
+  try {
+    const deletedInterviewee = await Interviewee.findByIdAndDelete(intervieweeId)
+      .session(session);
+
+    return { deletedInterviewee };
+  } catch (error) {
+    return { error };
+  }
+};
+
 exports.getInterviewee = async (intervieweeId) => {
   try {
     const interviewee = await Interviewee.findOne({ _id: intervieweeId });
@@ -56,16 +67,16 @@ exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
   try {
     const intervieweeData = await Interviewee.findOne({
       _id: intervieweeId,
-    }).lean();    
-  
+    }).lean();
+
     Object.keys(interviewee.filterScores).forEach((key) => {
       if (!intervieweeData.filterScores[key]) {
         intervieweeData.filterScores[key] = [];
       }
-  
+
       intervieweeData.filterScores[key].push(interviewee.filterScores[key]);
     });
-  
+
     const updatedInterviewee = await Interviewee.findByIdAndUpdate(
       intervieweeId,
       {
@@ -78,7 +89,7 @@ exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
       },
       { new: true }
     );
-  
+
     return { intervieweeData: updatedInterviewee };
   } catch (error) {
     return { error };
@@ -97,5 +108,5 @@ exports.updateIntervieweeQuestion = async ({ intervieweeId, question }) => {
     );
   } catch (error) {
     return { error };
-  } 
+  }
 };
