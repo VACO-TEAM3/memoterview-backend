@@ -55,4 +55,5 @@ const intervieweeSchema = new mongoose.Schema({
     default: false,
   },
 }, { timestamps: true });
+
 module.exports = mongoose.model("Interviewee", intervieweeSchema);
