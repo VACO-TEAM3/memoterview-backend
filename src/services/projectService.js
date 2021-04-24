@@ -97,6 +97,20 @@ exports.deleteProjects = async (projectId, session) => {
   }
 };
 
+exports.updateInterviewRoom = async (projectId, isOpened) => {
+  try {
+    const project = await Project.findByIdAndUpdate(
+      projectId,
+      { isOpened },
+      { new: true }
+    );
+
+    return { project };
+  } catch (error) {
+    return { updateInterviewRoom: error };
+  }
+};
+
 exports.deleteCandidate = async ({ projectId, intervieweeId }, session) => {
   try {
     const deletedCandidates = await Project.findByIdAndUpdate(
