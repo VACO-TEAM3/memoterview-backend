@@ -349,13 +349,11 @@ router.post(
 
 router.delete(
   "/:project_id/interviewees/:interviewee_id",
-  // validate(projectIdParamsSchema, "params"),
-  // validate(intervieweeIdParamsSchema, "params"),
+  validate(intervieweeIdParamsSchema, "params"),
   async (req, res, next) => {
     const session = await startSession();
 
     try {
-      console.log(req.params);
       session.startTransaction();
       const { project_id: projectId, interviewee_id: intervieweeId } = req.params;
 
@@ -366,8 +364,6 @@ router.delete(
       await session.commitTransaction();
 
       session.endSession();
-
-      console.log(deletedInterviewee);
 
       return res.json({
         result: "ok",
