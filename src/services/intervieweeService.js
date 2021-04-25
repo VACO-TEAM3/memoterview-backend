@@ -54,7 +54,8 @@ exports.getInterviewees = async (projectId) => {
 
 exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
   try {
-    const intervieweeData = await Interviewee.findOne({ _id: intervieweeId });
+    const intervieweeData = await Interviewee.findOne({ _id: intervieweeId }).lean();
+    
     Object.keys(interviewee.filterScores).forEach((key) => {
       if (!intervieweeData.filterScores[key]) {
         intervieweeData.filterScores[key] = [];
@@ -64,15 +65,15 @@ exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
     });
 
     const updatedInterviewee =  await Interviewee.findByIdAndUpdate(intervieweeId, {
-      $push: {
-        questions: { $each: interviewee.questions },
-        comments: { $each: interviewee.comments },
-      },
       $set: {
         filterScores: { ...intervieweeData.filterScores },
       },
+      $push: {
+        questions: { $each: interviewee.questions },
+        comments: interviewee.comments,
+      },
     }, { new: true });
-    
+
     return { intervieweeData: updatedInterviewee };
   } catch (error) {
     return { error };
