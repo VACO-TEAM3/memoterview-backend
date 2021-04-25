@@ -45,12 +45,13 @@ module.exports = ({ app }) => {
     });
 
     socket.on("disconnect", () => {
+      console.log(25);
       socket.broadcast.emit("userLeft");
       const roomID = socketToRoom[socket.id];
       const leftUsers = rooms[roomID]?.members.filter(
         (member) => member.socketID !== socket.id
       );
-
+      console.log(leftUsers);
       if (leftUsers?.length !== 0) {
         if (rooms[roomID]) {
           rooms[roomID].members = leftUsers;
