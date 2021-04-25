@@ -359,9 +359,9 @@ router.delete(
       session.startTransaction();
       const { project_id: projectId, interviewee_id: intervieweeId } = req.params;
 
-      const { deletedInterviewee } = await deleteInterviewee({ intervieweeId }, session);
+      await deleteCandidate({ projectId, intervieweeId }, session);
 
-      await deleteCandidate(({ projectId, intervieweeId }, session));
+      const { deletedInterviewee } = await deleteInterviewee({ intervieweeId }, session);
 
       await session.commitTransaction();
 
