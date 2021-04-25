@@ -1,5 +1,15 @@
 const Project = require("../models/Project");
 const Interviewer = require("../models/Interviewer");
+const { databaseURL } = require("../config");
+const Interviewee = require("../models/Interviewee");
+
+exports.searchQuestions = async ({ question, projectId }) => {
+  try {
+  } catch (error) {
+    return { searchQuestionsError: error };
+  }
+};
+
 
 exports.createProject = async ({ title, filters, creator, participants }) => {
   try {
