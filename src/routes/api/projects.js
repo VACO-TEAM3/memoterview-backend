@@ -4,6 +4,7 @@ const multer = require("multer");
 const util = require("util");
 const fs = require("fs");
 const nodemailer = require("nodemailer");
+const { getAverageScore, getFilterAvgScors } = require("../../utils/getAverageScroe");
 
 const {
   mailing: { gmail },
@@ -140,7 +141,9 @@ router.patch(
 router.get("/:project_id/interviewees", async (req, res, next) => {
   try {
     const projectId = req.params.project_id;
+
     const { candidates } = await getInterviewees(projectId);
+
     const intervieweeList = candidates.map((interviewee) => ({
       id: interviewee._id,
       name: interviewee.name,
@@ -148,8 +151,13 @@ router.get("/:project_id/interviewees", async (req, res, next) => {
       interviewDate: interviewee.createdAt,
       filterScores: interviewee.filterScores,
       isInterviewed: interviewee.isInterviewed,
-      question: interviewee.question,
+      questions: interviewee.questions,
+      comments: interviewee.comments,
+      interviewDuration: interviewee.interviewDuration,
       resumePath: interviewee.resumePath,
+      commentAvgScore: getAverageScore(interviewee.comments),
+      questionAvgScore: getAverageScore(interviewee.questions),
+      filterAvgScores: getFilterAvgScors(interviewee.filterScores),
     }));
 
     return res.json({
@@ -306,6 +314,8 @@ router.patch(
 
 router.post(
   "/:project_id/interviewees/:interviewee_id/invite",
+  // validate(projectIdParamsSchema, "params"),
+  validate(intervieweeIdParamsSchema, "params"),
   validate(sendInvitingEmailBodySchema, "body"),
   async (req, res, next) => {
     const { userEmail, welcomePageLink } = req.body;
@@ -338,23 +348,26 @@ router.post(
 );
 
 router.delete(
-  ":project_id/interviewees/:interviewee_id",
-  validate(projectIdParamsSchema, "params"),
-  validate(intervieweeIdParamsSchema, "params"),
+  "/:project_id/interviewees/:interviewee_id",
+  // validate(projectIdParamsSchema, "params"),
+  // validate(intervieweeIdParamsSchema, "params"),
   async (req, res, next) => {
     const session = await startSession();
 
     try {
+      console.log(req.params);
       session.startTransaction();
       const { project_id: projectId, interviewee_id: intervieweeId } = req.params;
 
-      const { deletedInterviewee } = await deleteInterviewee(intervieweeId, session);
+      const { deletedInterviewee } = await deleteInterviewee({ intervieweeId }, session);
 
       await deleteCandidate(({ projectId, intervieweeId }, session));
 
       await session.commitTransaction();
 
       session.endSession();
+
+      console.log(deletedInterviewee);
 
       return res.json({
         result: "ok",
