@@ -184,7 +184,17 @@ router.post(
     } catch (error) {
       await session.abortTransaction();
 
-      session.endSession();
+router.get(//validation 필요
+  "/:project_id/:interviewee_id",
+  async (req, res, next) => {
+    try {
+      const intervieweeId = req.params.interviewee_id;
+      const { interviewee } = await getInterviewee(intervieweeId);
+
+      return res.json({
+        url: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${interviewee.resumePath}`,
+      });
+    } catch (error) {
       next(error);
     }
   }
@@ -227,7 +237,7 @@ router.delete(
 );
 
 router.patch(
-  "/:project_id/interviewees/:interviewee_id",
+  "/:project_id/interviewees/:interviewee_id", // need validation
   async (req, res, next) => {
     try {
       const { intervieweeId, interviewee } = req.body; // project Id 있음
