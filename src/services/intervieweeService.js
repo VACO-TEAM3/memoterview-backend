@@ -87,7 +87,6 @@ exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
 
 exports.updateIntervieweeQuestion = async ({ intervieweeId, question }) => {
   try {
-    console.log(intervieweeId, question);
     await Interviewee.findByIdAndUpdate(
       intervieweeId,
       {
