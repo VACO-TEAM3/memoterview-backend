@@ -126,7 +126,6 @@ router.get(
     try {
       console.log(req.params);
       const projectId = req.params.project_id;
-      console.log(projectId);
       const { candidates } = await getInterviewees(projectId);
       const intervieweeList = candidates.map((interviewee) => ({
         id: interviewee._id,
