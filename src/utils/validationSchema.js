@@ -29,3 +29,13 @@ exports.searchInterviewersQuerySchema = Joi.object({
 exports.userIdParamsSchema = Joi.object({
   user_id: Joi.string().required(),
 });
+
+exports.intervieweeQuestionSchema = Joi.object({
+  intervieweeId: Joi.string().required(),
+  question: {
+    title: Joi.string().allow(""),
+    answer: Joi.string().allow(""),
+    questioner: Joi.string().required(),
+    score: Joi.number().required(),
+  },
+});

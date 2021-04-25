@@ -14,16 +14,15 @@ const commentSchema = new mongoose.Schema({
   },
 }, { _id: false });
 const questionSchema = new mongoose.Schema({
-  question: {
+  title: {
     type: String,
-    required: true,
   },
   answer: {
     type: String,
-    required: true,
   },
   score: {
     type: Number,
+    required: true,
   },
   questioner: {
     type: mongoose.Schema.Types.ObjectId,
