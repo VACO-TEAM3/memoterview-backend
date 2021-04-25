@@ -31,6 +31,7 @@ exports.deleteInterviewees = async ({ intervieweeIds }, session) => {
 
 exports.deleteInterviewee = async ({ intervieweeId }, session) => {
   try {
+    console.log("id", intervieweeId);
     const deletedInterviewee = await Interviewee.findByIdAndDelete(intervieweeId)
       .session(session);
 
