@@ -54,28 +54,49 @@ exports.getInterviewees = async (projectId) => {
 
 exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
   try {
-    const intervieweeData = await Interviewee.findOne({ _id: intervieweeId }).lean();
-    
+    const intervieweeData = await Interviewee.findOne({
+      _id: intervieweeId,
+    }).lean();    
+  
     Object.keys(interviewee.filterScores).forEach((key) => {
       if (!intervieweeData.filterScores[key]) {
         intervieweeData.filterScores[key] = [];
       }
-
+  
       intervieweeData.filterScores[key].push(interviewee.filterScores[key]);
     });
-
-    const updatedInterviewee =  await Interviewee.findByIdAndUpdate(intervieweeId, {
-      $set: {
-        filterScores: { ...intervieweeData.filterScores },
+  
+    const updatedInterviewee = await Interviewee.findByIdAndUpdate(
+      intervieweeId,
+      {
+        $set: {
+          filterScores: { ...intervieweeData.filterScores },
+        },
+        $push: {
+          comments: interviewee.comments,
+        },
       },
-      $push: {
-        questions: { $each: interviewee.questions },
-        comments: interviewee.comments,
-      },
-    }, { new: true });
-
+      { new: true }
+    );
+  
     return { intervieweeData: updatedInterviewee };
   } catch (error) {
     return { error };
   }
+};
+
+exports.updateIntervieweeQuestion = async ({ intervieweeId, question }) => {
+  try {
+    console.log(intervieweeId, question);
+    await Interviewee.findByIdAndUpdate(
+      intervieweeId,
+      {
+        $push: {
+          questions: question,
+        },
+      }
+    );
+  } catch (error) {
+    return { error };
+  } 
 };
