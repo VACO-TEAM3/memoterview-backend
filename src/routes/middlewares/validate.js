@@ -11,6 +11,8 @@ module.exports = function validate(schema, property) {
       const { details } = error;
       const message = details.map((i) => i.message).join(",");
 
+      console.log(details, message);
+
       if (property === "params") {
         return next(createError(404, { message }));
       }

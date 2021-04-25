@@ -46,5 +46,6 @@ exports.sendInvitingEmailBodySchema = Joi.object({
 });
 
 exports.intervieweeIdParamsSchema = Joi.object({
+  project_id: Joi.string().required(),
   interviewee_id: Joi.string().required(),
 });

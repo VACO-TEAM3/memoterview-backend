@@ -113,13 +113,10 @@ exports.updateInterviewRoom = async (projectId, isOpened) => {
 
 exports.deleteCandidate = async ({ projectId, intervieweeId }, session) => {
   try {
-    console.log("here", projectId, intervieweeId);
     const deletedCandidates = await Project.findByIdAndUpdate(
       projectId,
       { $pull: { candidates: intervieweeId } }
     ).session(session);
-
-    console.log(deletedCandidates);
 
     return { deletedCandidates };
   } catch (error) {
