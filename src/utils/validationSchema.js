@@ -21,6 +21,10 @@ exports.searchInterviewersQuerySchema = Joi.object({
   email: Joi.string().required(),
 });
 
+exports.serachIntervieweeQuestionQuerySchema = Joi.object({
+  question: Joi.string().required(),
+});
+
 exports.userIdParamsSchema = Joi.object({
   user_id: Joi.string().required(),
 });

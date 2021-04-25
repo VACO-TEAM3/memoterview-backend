@@ -12,6 +12,8 @@ const {
   sendInvitingEmailBodySchema,
   projectIntervieweeIdParamsSchema,
   updateInterviewRoomBodySchema,
+  intervieweeIdParamsSchema,
+  serachIntervieweeQuestionQuerySchema,
 } = require("../../utils/validationSchema");
 const {
   createProject,
@@ -20,6 +22,7 @@ const {
   addCandidateToProject,
   deleteProjects,
   deleteCandidate,
+  searchQuestions,
 } = require("../../services/projectService");
 const {
   deleteProjectOnMyProjects,
@@ -204,6 +207,24 @@ router.get(
     }
   }
 );
+
+router.get(
+  "/:project_id/search",
+  validate(serachIntervieweeQuestionQuerySchema, "query"),
+  async (req, res, next) => {
+    try {
+      const question = req.query.question;
+      const projectId = req.params.project_id;
+
+      const result = await searchQuestions({ question, projectId });
+
+      return res.json({ result: "ok" });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 
 router.delete(
   "/:project_id",
