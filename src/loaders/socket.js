@@ -52,7 +52,7 @@ module.exports = ({ app }) => {
       const leftUsers = rooms[roomID]?.members.filter(
         (member) => member.socketID !== socket.id
       );
-      console.log(leftUsers);
+      
       if (leftUsers?.length !== 0) {
         if (rooms[roomID]) {
           rooms[roomID].members = leftUsers;
