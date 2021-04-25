@@ -96,17 +96,3 @@ exports.deleteProjects = async (projectId, session) => {
     return { deleteProjectsError: error };
   }
 };
-
-exports.updateInterviewRoom = async (projectId, isOpened) => {
-  try {
-    const project = await Project.findByIdAndUpdate(
-      projectId, 
-      { isOpened },
-      { new: true }
-    );
-
-    return { project };
-  } catch (error) {
-    return { updateInterviewRoom: error };
-  }
-};

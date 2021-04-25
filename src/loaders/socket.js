@@ -24,6 +24,8 @@ module.exports = ({ app }) => {
       }
 
       rooms[roomID].members.push({ ...userData, socketID: socket.id });
+
+      console.log(rooms[roomID].members, socket.id);
       users[socket.id] = userData;
       socketToRoom[socket.id] = roomID;
 
@@ -45,7 +47,6 @@ module.exports = ({ app }) => {
     });
 
     socket.on("disconnect", () => {
-      console.log(25);
       socket.broadcast.emit("userLeft");
       const roomID = socketToRoom[socket.id];
       const leftUsers = rooms[roomID]?.members.filter(
@@ -63,7 +64,7 @@ module.exports = ({ app }) => {
       delete users[socket.id];
 
       delete socketToRoom[socket.id];
-
+      console.log("deleted", socket.id);
       socket.emit("successToLeave");
     });
 
