@@ -25,7 +25,6 @@ module.exports = ({ app }) => {
 
       rooms[roomID].members.push({ ...userData, socketID: socket.id });
 
-      console.log(rooms[roomID].members, socket.id);
       users[socket.id] = userData;
       socketToRoom[socket.id] = roomID;
 
@@ -34,7 +33,8 @@ module.exports = ({ app }) => {
       const targetUsers = rooms[roomID].members.filter(
         (member) => member.socketID !== socket.id
       );
-
+      console.log(socket.id);
+      
       socket.emit("successJoinUser", targetUsers);
     });
 
@@ -47,7 +47,6 @@ module.exports = ({ app }) => {
     });
 
     socket.on("disconnect", () => {
-      socket.broadcast.emit("userLeft");
       const roomID = socketToRoom[socket.id];
       const leftUsers = rooms[roomID]?.members.filter(
         (member) => member.socketID !== socket.id
@@ -64,8 +63,8 @@ module.exports = ({ app }) => {
       delete users[socket.id];
 
       delete socketToRoom[socket.id];
-      console.log("deleted", socket.id);
-      socket.emit("successToLeave");
+
+      socket.broadcast.emit("successToLeaveOtherUser", { id: socket.id });
     });
 
     socket.on("startInterview", () => {
