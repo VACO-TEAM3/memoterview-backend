@@ -19,7 +19,6 @@ const {
   addToJoinedProjects,
   addCandidateToProject,
   deleteProjects,
-  updateInterviewRoom,
   deleteCandidate,
 } = require("../../services/projectService");
 const validate = require("../middlewares/validate");
@@ -34,6 +33,7 @@ const {
   createInterviewee,
   updateInterviewee,
   deleteInterviewee,
+  updateInterviewRoom,
 } = require("../../services/intervieweeService");
 const { generateResumeUrl } = require("../../utils/generateResumeUrl");
 const { uploadFileToS3 } = require("../../loaders/s3");
@@ -108,6 +108,7 @@ router.get("/:project_id/interviewees", async (req, res, next) => {
       interviewDuration: interviewee.interviewDuration,
       resumePath: interviewee.resumePath,
       isRoomOpened: interviewee.isRoomOpened,
+      questionsNum: interviewee.questions.length,
       commentAvgScore: getAverageScore(interviewee.comments),
       questionAvgScore: getAverageScore(interviewee.questions),
       filterAvgScores: getFilterAvgScors(interviewee.filterScores),
@@ -166,6 +167,10 @@ router.post(
           question: newInterviewee.question,
           resumePath: newInterviewee.resumePath,
           isRoomOpened: newInterviewee.isRoomOpened,
+          questionsNum: newInterviewee.questions.length,
+          commentAvgScore: getAverageScore(newInterviewee.comments),
+          questionAvgScore: getAverageScore(newInterviewee.questions),
+          filterAvgScores: getFilterAvgScors(newInterviewee.filterScores),
         },
       });
     } catch (error) {
@@ -234,30 +239,22 @@ router.patch(
   async (req, res, next) => {
     try {
       const { intervieweeId, interviewee } = req.body; // project Id 있음
-      const {
-        intervieweeData: {
-          _id,
-          email,
-          name,
-          resumePath,
-          questions,
-          comments,
-          isInterviewed,
-          filterScores,
-          isRoomOpened,
-        },
-      } = await updateInterviewee({ intervieweeId, interviewee });
+      const updatedInterviewee = await updateInterviewee({ intervieweeId, interviewee });
 
       return res.json({
         data: {
-          id: _id,
-          email,
-          name,
-          resumePath,
-          questions,
-          comments,
-          isInterviewed,
-          filterScores,
+          id: updatedInterviewee._id,
+          name: updatedInterviewee.name,
+          email: updatedInterviewee.email,
+          interviewDate: updatedInterviewee.createdAt,
+          isInterviewed: updatedInterviewee.isInterviewed,
+          interviewDuration: updatedInterviewee.interviewDuration,
+          resumePath: updatedInterviewee.resumePath,
+          isRoomOpened: updatedInterviewee.isRoomOpened,
+          questionsNum: updatedInterviewee.questions.length,
+          commentAvgScore: getAverageScore(updatedInterviewee.comments),
+          questionAvgScore: getAverageScore(updatedInterviewee.questions),
+          filterAvgScores: getFilterAvgScors(updatedInterviewee.filterScores),
         },
         result: "ok",
       });
@@ -290,13 +287,26 @@ router.patch(
   validate(updateInterviewRoomBodySchema, "body"),
   async (req, res, next) => {
     const { interviewee_id: intervieweeId } = req.params;
-    const { isOpened } = req.body;
+    const { isRoomOpened } = req.body;
 
-    const interviewee = await updateInterviewRoom({ intervieweeId, isOpened });
+    const { interviewee } = await updateInterviewRoom({ intervieweeId, isRoomOpened });
 
     res.json({
       result: "ok",
-      data: interviewee,
+      data: {
+        id: interviewee._id,
+        name: interviewee.name,
+        email: interviewee.email,
+        interviewDate: interviewee.createdAt,
+        isInterviewed: interviewee.isInterviewed,
+        interviewDuration: interviewee.interviewDuration,
+        resumePath: interviewee.resumePath,
+        isRoomOpened: interviewee.isRoomOpened,
+        questionsNum: interviewee.questions.length,
+        commentAvgScore: getAverageScore(interviewee.comments),
+        questionAvgScore: getAverageScore(interviewee.questions),
+        filterAvgScores: getFilterAvgScors(interviewee.filterScores),
+      },
     });
   }
 );

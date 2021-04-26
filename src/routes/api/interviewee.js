@@ -12,7 +12,6 @@ router.patch(
   async (req, res, next) => {
     try {
       const { intervieweeId, question } = req.body;
-      console.log(25);
       await updateIntervieweeQuestion({ intervieweeId, question });
 
       return res.json({ result: "ok" });
