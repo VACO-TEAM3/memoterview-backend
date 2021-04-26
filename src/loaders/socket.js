@@ -52,7 +52,7 @@ module.exports = ({ app }) => {
 
     socket.on("disconnect", () => {
       const roomID = socketToRoom[socket.id];
-      const leftUsers = rooms[roomID]?.members.filter(
+      const leftUsers = rooms[roomID].members.filter(
         (member) => member.socketID !== socket.id
       );
 

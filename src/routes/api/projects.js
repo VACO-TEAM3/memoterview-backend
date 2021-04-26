@@ -210,21 +210,26 @@ router.get(
 
 router.get(
   "/:project_id/search",
-  validate(serachIntervieweeQuestionQuerySchema, "query"),
+  validate(serachIntervieweeQuestionQuerySchema),
   async (req, res, next) => {
     try {
-      const question = req.query.question;
+      const query = req.query.question;
       const projectId = req.params.project_id;
+      console.log(projectId, query);
 
-      const result = await searchQuestions({ question, projectId });
+      const questionData = await searchQuestions({ query, projectId });
 
-      return res.json({ result: "ok" });
+      console.log(questionData, "data");
+
+      return res.json({
+        result: "ok",
+        data: questionData,
+      });
     } catch (error) {
       next(error);
     }
   }
 );
-
 
 router.delete(
   "/:project_id",

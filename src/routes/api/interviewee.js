@@ -11,8 +11,9 @@ router.patch(
   validate(intervieweeQuestionSchema, "body"),
   async (req, res, next) => {
     try {
-      const { intervieweeId, question } = req.body;
-      await updateIntervieweeQuestion({ intervieweeId, question });
+      const { projectId, intervieweeId, question } = req.body;
+
+      await updateIntervieweeQuestion({ projectId, intervieweeId, question });
 
       return res.json({ result: "ok" });
     } catch (error) {
