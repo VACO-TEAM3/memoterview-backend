@@ -21,8 +21,6 @@ exports.searchQuestions = async ({ query, projectId }) => {
       intervieweeId: searchResult.interviewee._id,
     }));
 
-    console.log(searchResultFormat, "??");
-
     return searchResultFormat;
   } catch (error) {
     return { searchQuestionsError: error };
