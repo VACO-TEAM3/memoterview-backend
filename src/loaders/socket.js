@@ -72,7 +72,9 @@ module.exports = ({ app }) => {
     });
 
     socket.on("startInterview", () => {
-      socket.broadcast.emit("startInterview");
+      const roomID = socketToRoom[socket.id];
+      
+      io.in(roomID).emit("startInterview");
     });
 
     // audio record socket logics
