@@ -15,7 +15,7 @@ exports.searchQuestions = async ({ query, projectId }) => {
       answer: searchResult.answer,
       score: searchResult.score,
       interviewerName: searchResult.interviewer.username,
-      questionerAvatar: searchResult.interviewer.avatar,
+      interviewerAvatar: searchResult.interviewer.avatar,
       intervieweeName: searchResult.interviewee.name,
       interviewDate: searchResult.interviewee.createdAt,
       intervieweeId: searchResult.interviewee._id,
