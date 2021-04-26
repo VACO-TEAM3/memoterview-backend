@@ -42,8 +42,8 @@ exports.deleteInterviewee = async ({ intervieweeId }, session) => {
 
 exports.getInterviewee = async (intervieweeId) => {
   try {
-    const interviewee = await Interviewee.findOne({ _id: intervieweeId });
-
+    const interviewee = await Interviewee.findOne({ _id: intervieweeId }).lean();
+    console.log(interviewee);
     return { interviewee };
   } catch (error) {
     return { error };
