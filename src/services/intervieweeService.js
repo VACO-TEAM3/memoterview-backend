@@ -31,7 +31,6 @@ exports.deleteInterviewees = async ({ intervieweeIds }, session) => {
 
 exports.deleteInterviewee = async ({ intervieweeId }, session) => {
   try {
-    console.log("id", intervieweeId);
     const deletedInterviewee = await Interviewee.findByIdAndDelete(intervieweeId)
       .session(session);
 
@@ -112,15 +111,13 @@ exports.updateIntervieweeQuestion = async ({ intervieweeId, question }) => {
   }
 };
 
-exports.updateInterviewRoom = async ({ intervieweeId, isOpened }) => {
+exports.updateInterviewRoom = async ({ intervieweeId, isRoomOpened }) => {
   try {
     const interviewee = await Interviewee.findByIdAndUpdate(
       intervieweeId,
-      { isOpened },
+      { isRoomOpened },
       { new: true }
     );
-
-    console.log(interviewee);
 
     return { interviewee };
   } catch (error) {
