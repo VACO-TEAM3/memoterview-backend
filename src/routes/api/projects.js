@@ -182,7 +182,7 @@ router.post(
 
 router.get(
   //validation 필요
-  "/:project_id/:interviewee_id",
+  "/:project_id/interviewees/:interviewee_id",
   async (req, res, next) => {
     try {
       const intervieweeId = req.params.interviewee_id;
