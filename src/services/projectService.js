@@ -11,7 +11,7 @@ exports.searchQuestions = async ({ query, projectId }) => {
       .populate("interviewee");
 
     const searchResultFormat = searchResult.map(searchResult => ({
-      title: searchResult.question,
+      title: searchResult.title,
       answer: searchResult.answer,
       score: searchResult.score,
       interviewerName: searchResult.interviewer.username,
