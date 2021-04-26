@@ -16,7 +16,6 @@ router.patch(
 
       return res.json({ result: "ok" });
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
