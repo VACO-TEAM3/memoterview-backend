@@ -1,3 +1,5 @@
+const { updateInterviewComplete } = require("../services/intervieweeService");
+
 module.exports = ({ app }) => {
   const io = require("socket.io")();
 
@@ -34,9 +36,9 @@ module.exports = ({ app }) => {
       const targetUsers = rooms[roomID].members.filter(
         (member) => member.socketID !== socket.id
       );
-      
+
       socket.emit("joinSuccess", targetUsers);
-      
+
       if (rooms[roomID].isIntervieweeJoined) {
         userData.isInterviewee ? socket.broadcast.emit("enableButton") : socket.emit("enableButton");
       }
@@ -50,11 +52,17 @@ module.exports = ({ app }) => {
       io.to(caller).emit("receiveReturnSignal", { signal, id: socket.id });
     });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", ({ interviewDuration }) => {
       const roomID = socketToRoom[socket.id];
-      const leftUsers = rooms[roomID].members.filter(
+      const leftUsers = rooms[roomID]?.members.filter(
         (member) => member.socketID !== socket.id
       );
+
+      const leftInterviewers = leftUsers ? leftUsers.filter((member) => !member.isInterviewee) : [];
+
+      if (leftInterviewers.length === 0) {
+        updateInterviewComplete({ intervieweeId: roomID, interviewDuration });
+      }
 
       if (leftUsers?.length !== 0) {
         if (rooms[roomID]) {
@@ -73,7 +81,7 @@ module.exports = ({ app }) => {
 
     socket.on("startInterview", () => {
       const roomID = socketToRoom[socket.id];
-      
+
       io.in(roomID).emit("startInterview");
     });
 
@@ -185,7 +193,7 @@ module.exports = ({ app }) => {
       const leftUsers = rooms[roomID]?.members.filter(
         (member) => member.socketID !== socket.id
       );
-      
+
       if (leftUsers?.length !== 0) {
         if (rooms[roomID]) {
           rooms[roomID].members = leftUsers;
@@ -197,7 +205,7 @@ module.exports = ({ app }) => {
       delete users[socket.id];
 
       delete socketToRoom[socket.id];
-      
+
       socket.to(roomID).emit("successToLeaveOtherUser", { id: socket.id });
     });
   });

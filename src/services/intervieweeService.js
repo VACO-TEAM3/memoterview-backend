@@ -136,3 +136,22 @@ exports.updateInterviewRoom = async ({ intervieweeId, isRoomOpened }) => {
     return { updateInterviewRoom: error };
   }
 };
+
+exports.updateInterviewComplete = async ({ intervieweeId, interviewDuration }) => {
+  try {
+    const interviewee = await Interviewee.findByIdAndUpdate(
+      intervieweeId,
+      {
+        isRoomOpened: false,
+        isInterviewed: true,
+        interviewDate: new Date(),
+        interviewDuration,
+      },
+      { new: true }
+    );
+
+    return { interviewee };
+  } catch (error) {
+    return { error };
+  }
+};
