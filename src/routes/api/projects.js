@@ -98,12 +98,11 @@ router.post(
 router.get("/:project_id/interviewees", async (req, res, next) => {
   try {
     const projectId = req.params.project_id;
-
     const { candidates } = await getInterviewees(projectId);
 
     const intervieweeList = candidates.map((interviewee) => ({
-      _id: interviewee._id,
       id: interviewee._id,
+      _id: interviewee._id,
       name: interviewee.name,
       email: interviewee.email,
       interviewDate: interviewee.interviewDate,

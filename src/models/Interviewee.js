@@ -10,28 +10,7 @@ const commentSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    commentor: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Interviewer",
-    },
-  },
-  { _id: false }
-);
-
-const questionSchema = new mongoose.Schema(
-  {
-    question: {
-      type: String,
-      required: true,
-    },
-    answer: {
-      type: String,
-      required: true,
-    },
-    score: {
-      type: Number,
-    },
-    questioner: {
+    commenter: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Interviewer",
     },
@@ -59,7 +38,10 @@ const intervieweeSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.Mixed,
       default: {},
     },
-    questions: [questionSchema],
+    questions: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Question"
+    }],
     comments: [commentSchema],
     isInterviewed: {
       type: Boolean,

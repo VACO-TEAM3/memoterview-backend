@@ -31,10 +31,11 @@ exports.userIdParamsSchema = Joi.object({
 
 exports.intervieweeQuestionSchema = Joi.object({
   intervieweeId: Joi.string().required(),
+  projectId: Joi.string().required(),
   question: {
     title: Joi.string().allow(""),
     answer: Joi.string().allow(""),
-    questioner: Joi.string().required(),
+    interviewer: Joi.string().required(),
     score: Joi.number().required(),
   },
 });
