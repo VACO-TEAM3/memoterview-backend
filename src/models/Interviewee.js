@@ -69,6 +69,10 @@ const intervieweeSchema = new mongoose.Schema(
       type: String,
       default: "0",
     },
+    isRoomOpened: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

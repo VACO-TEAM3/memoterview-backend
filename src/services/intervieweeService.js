@@ -111,3 +111,19 @@ exports.updateIntervieweeQuestion = async ({ intervieweeId, question }) => {
     return { error };
   }
 };
+
+exports.updateInterviewRoom = async ({ intervieweeId, isOpened }) => {
+  try {
+    const interviewee = await Interviewee.findByIdAndUpdate(
+      intervieweeId,
+      { isOpened },
+      { new: true }
+    );
+
+    console.log(interviewee);
+
+    return { interviewee };
+  } catch (error) {
+    return { updateInterviewRoom: error };
+  }
+};
