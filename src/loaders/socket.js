@@ -33,8 +33,7 @@ module.exports = ({ app }) => {
       const targetUsers = rooms[roomID].members.filter(
         (member) => member.socketID !== socket.id
       );
-      console.log(socket.id);
-      
+
       socket.emit("successJoinUser", targetUsers);
     });
 
@@ -51,7 +50,7 @@ module.exports = ({ app }) => {
       const leftUsers = rooms[roomID]?.members.filter(
         (member) => member.socketID !== socket.id
       );
-      
+
       if (leftUsers?.length !== 0) {
         if (rooms[roomID]) {
           rooms[roomID].members = leftUsers;
