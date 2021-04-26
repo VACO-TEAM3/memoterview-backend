@@ -100,14 +100,8 @@ router.get("/:project_id/interviewees", async (req, res, next) => {
     const { candidates } = await getInterviewees(projectId);
 
     const intervieweeList = candidates.map((interviewee) => ({
+      ...interviewee,
       id: interviewee._id,
-      name: interviewee.name,
-      email: interviewee.email,
-      interviewDate: interviewee.createdAt,
-      isInterviewed: interviewee.isInterviewed,
-      interviewDuration: interviewee.interviewDuration,
-      resumePath: interviewee.resumePath,
-      isRoomOpened: interviewee.isRoomOpened,
       questionsNum: interviewee.questions.length,
       commentAvgScore: getAverageScore(interviewee.comments),
       questionAvgScore: getAverageScore(interviewee.questions),
@@ -150,6 +144,8 @@ router.post(
         session
       );
 
+      console.log("newInterviewee", newInterviewee);
+
       await addCandidateToProject(projectId, newInterviewee._id, session);
 
       await session.commitTransaction();
@@ -158,14 +154,17 @@ router.post(
       return res.json({
         result: "ok",
         data: {
+          _id: newInterviewee._id,
           id: newInterviewee._id,
           name: newInterviewee.name,
           email: newInterviewee.email,
-          interviewDate: newInterviewee.createdAt,
-          filterScores: newInterviewee.filterScores,
-          isInterviewed: newInterviewee.isInterviewed,
-          question: newInterviewee.question,
+          interviewDate: newInterviewee.interviewDate,
           resumePath: newInterviewee.resumePath,
+          filterScores: newInterviewee.filterScores,
+          questions: newInterviewee.questions,
+          comments: newInterviewee.comments,
+          isInterviewed: newInterviewee.isInterviewed,
+          interviewDuration: newInterviewee.interviewDuration,
           isRoomOpened: newInterviewee.isRoomOpened,
           questionsNum: newInterviewee.questions.length,
           commentAvgScore: getAverageScore(newInterviewee.comments),
@@ -188,9 +187,18 @@ router.get(
     try {
       const intervieweeId = req.params.interviewee_id;
       const { interviewee } = await getInterviewee(intervieweeId);
+      console.log("1", interviewee);
 
       return res.json({
-        url: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${interviewee.resumePath}`,
+        result: "ok",
+        data: {
+          ...interviewee,
+          id: interviewee._id,
+          questionsNum: interviewee.questions.length,
+          commentAvgScore: getAverageScore(interviewee.comments),
+          questionAvgScore: getAverageScore(interviewee.questions),
+          filterAvgScores: getFilterAvgScors(interviewee.filterScores),
+        },
       });
     } catch (error) {
       next(error);
@@ -243,13 +251,17 @@ router.patch(
 
       return res.json({
         data: {
+          _id: updatedInterviewee._id,
           id: updatedInterviewee._id,
           name: updatedInterviewee.name,
           email: updatedInterviewee.email,
-          interviewDate: updatedInterviewee.createdAt,
+          interviewDate: updatedInterviewee.interviewDate,
+          resumePath: updatedInterviewee.resumePath,
+          filterScores: updatedInterviewee.filterScores,
+          questions: updatedInterviewee.questions,
+          comments: updatedInterviewee.comments,
           isInterviewed: updatedInterviewee.isInterviewed,
           interviewDuration: updatedInterviewee.interviewDuration,
-          resumePath: updatedInterviewee.resumePath,
           isRoomOpened: updatedInterviewee.isRoomOpened,
           questionsNum: updatedInterviewee.questions.length,
           commentAvgScore: getAverageScore(updatedInterviewee.comments),
@@ -294,13 +306,17 @@ router.patch(
     res.json({
       result: "ok",
       data: {
+        _id: interviewee._id,
         id: interviewee._id,
         name: interviewee.name,
         email: interviewee.email,
-        interviewDate: interviewee.createdAt,
+        interviewDate: interviewee.interviewDate,
+        resumePath: interviewee.resumePath,
+        filterScores: interviewee.filterScores,
+        questions: interviewee.questions,
+        comments: interviewee.comments,
         isInterviewed: interviewee.isInterviewed,
         interviewDuration: interviewee.interviewDuration,
-        resumePath: interviewee.resumePath,
         isRoomOpened: interviewee.isRoomOpened,
         questionsNum: interviewee.questions.length,
         commentAvgScore: getAverageScore(interviewee.comments),
