@@ -10,6 +10,7 @@ module.exports = ({ app }) => {
       if (!rooms[roomID]) {
         rooms[roomID] = {
           members: [],
+          isIntervieweeJoined: false,
         };
       }
 
@@ -21,10 +22,10 @@ module.exports = ({ app }) => {
 
       if (userData.isInterviewee) {
         rooms[roomID].interviewee = socket.id;
+        rooms[roomID].isIntervieweeJoined = true;
       }
 
       rooms[roomID].members.push({ ...userData, socketID: socket.id });
-
       users[socket.id] = userData;
       socketToRoom[socket.id] = roomID;
 
@@ -33,8 +34,12 @@ module.exports = ({ app }) => {
       const targetUsers = rooms[roomID].members.filter(
         (member) => member.socketID !== socket.id
       );
-
-      socket.emit("successJoinUser", targetUsers);
+      
+      socket.emit("joinSuccess", targetUsers);
+      
+      if (rooms[roomID].isIntervieweeJoined) {
+        userData.isInterviewee ? socket.broadcast.emit("enableButton") : socket.emit("enableButton");
+      }
     });
 
     socket.on("sendSignal", ({ callee, caller, signal }) => {
@@ -172,11 +177,33 @@ module.exports = ({ app }) => {
         io.to(otherInterviewer.socketID).emit("enableButton");
       }
     });
+
+    socket.on("disconnect", () => {
+      const roomID = socketToRoom[socket.id];
+      const leftUsers = rooms[roomID]?.members.filter(
+        (member) => member.socketID !== socket.id
+      );
+      
+      if (leftUsers?.length !== 0) {
+        if (rooms[roomID]) {
+          rooms[roomID].members = leftUsers;
+        }
+      } else {
+        delete rooms[roomID];
+      }
+
+      delete users[socket.id];
+
+      delete socketToRoom[socket.id];
+      
+      socket.to(roomID).emit("successToLeaveOtherUser", { id: socket.id });
+    });
   });
 
   function checkRoomExists(roomID, socket) {
     if (!rooms[roomID]) {
       io.to(socket.id).emit("error", { message: "room is not exist" });
+
       return false;
     }
 
@@ -186,6 +213,7 @@ module.exports = ({ app }) => {
   function checkIntervieweeExists(roomID, socket) {
     if (!rooms[roomID].interviewee) {
       io.to(socket.id).emit("error", { message: "interviewee is not exist" });
+
       return false;
     }
 
@@ -195,6 +223,7 @@ module.exports = ({ app }) => {
   function checkQuestionerExists(roomID, socket) {
     if (!rooms[roomID].questioner) {
       io.to(socket.id).emit("error", { message: "questioner is not exist" });
+
       return false;
     }
 
