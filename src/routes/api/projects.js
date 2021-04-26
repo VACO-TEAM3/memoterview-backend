@@ -172,11 +172,9 @@ router.post(
       });
     } catch (error) {
       await session.abortTransaction();
-    }
-  }
-);
 
       session.endSession();
+      next(error);
     }
   }
 );
