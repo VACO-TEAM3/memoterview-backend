@@ -230,18 +230,59 @@ router.delete(
   }
 );
 
+router.patch(
+  "/:project_id/interviewees/:interviewee_id", // need validation
+  async (req, res, next) => {
+    try {
+      const { intervieweeId, interviewee } = req.body; // project Id 있음
+      const {
+        intervieweeData: {
+          _id,
+          email,
+          name,
+          resumePath,
+          questions,
+          comments,
+          isInterviewed,
+          filterScores,
+          isRoomOpened,
+        },
+      } = await updateInterviewee({ intervieweeId, interviewee });
+
+      return res.json({
+        data: {
+          id: _id,
+          email,
+          name,
+          resumePath,
+          questions,
+          comments,
+          isInterviewed,
+          filterScores,
+        },
+        result: "ok",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 router.post(
   "/:project_id/interviewees/:interviewee_id/invite",
   validate(projectIntervieweeIdParamsSchema, "params"),
   validate(sendInvitingEmailBodySchema, "body"),
   async (req, res, next) => {
     const { userEmail, welcomePageLink } = req.body;
+    const { interviewee_id: intervieweeId } = req.params;
 
-    const info = await sendInviteEmail({ welcomePageLink, userEmail });
+    const mainInfo = await sendInviteEmail({ welcomePageLink, userEmail });
+    const interviewee = await updateInterviewRoom({ intervieweeId, isOpened: true });
 
     res.json({
       result: "ok",
-      info,
+      mainInfo,
+      interviewee,
       message: "Sent Email",
     });
   }
