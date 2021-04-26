@@ -48,3 +48,7 @@ exports.projectIntervieweeIdParamsSchema = Joi.object({
   project_id: Joi.string().required(),
   interviewee_id: Joi.string().required(),
 });
+
+exports.updateInterviewRoomBodySchema = Joi.object({
+  isOpened: Joi.boolean().required(),
+});

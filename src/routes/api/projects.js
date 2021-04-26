@@ -11,6 +11,7 @@ const {
   updateRoomStateBodySchema,
   sendInvitingEmailBodySchema,
   projectIntervieweeIdParamsSchema,
+  updateInterviewRoomBodySchema,
 } = require("../../utils/validationSchema");
 const {
   createProject,
@@ -266,36 +267,32 @@ router.patch(
   }
 );
 
-router.patch(
+router.post(
   "/:project_id/interviewees/:interviewee_id/invite",
   validate(projectIntervieweeIdParamsSchema, "params"),
   validate(sendInvitingEmailBodySchema, "body"),
   async (req, res, next) => {
     const { userEmail, welcomePageLink } = req.body;
-    const { interviewee_id: intervieweeId } = req.params;
 
     const mainInfo = await sendInviteEmail({ welcomePageLink, userEmail });
-    const interviewee = await updateInterviewRoom({ intervieweeId, isOpened: true });
 
     res.json({
       result: "ok",
-      data: {
-        mainInfo,
-        interviewee,
-      },
+      data: mainInfo,
       message: "Sent Email",
     });
   }
 );
 
 router.patch(
-  "/:project_id/interviewees/:interviewee_id/closeRoom",
+  "/:project_id/interviewees/:interviewee_id/updateInterviewRoom",
   validate(projectIntervieweeIdParamsSchema, "params"),
-  validate(sendInvitingEmailBodySchema, "body"),
+  validate(updateInterviewRoomBodySchema, "body"),
   async (req, res, next) => {
     const { interviewee_id: intervieweeId } = req.params;
+    const { isOpened } = req.body;
 
-    const interviewee = await updateInterviewRoom({ intervieweeId, isOpened: false });
+    const interviewee = await updateInterviewRoom({ intervieweeId, isOpened });
 
     res.json({
       result: "ok",
