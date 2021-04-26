@@ -17,11 +17,6 @@ exports.projectIdParamsSchema = Joi.object({
   project_id: Joi.string().required(),
 });
 
-exports.updateRoomStateBodySchema = Joi.object({
-  roomState: Joi.boolean().required(),
-  projectId: Joi.string().required(),
-});
-
 exports.searchInterviewersQuerySchema = Joi.object({
   email: Joi.string().required(),
 });
