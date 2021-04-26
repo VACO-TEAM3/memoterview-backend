@@ -144,8 +144,6 @@ router.post(
         session
       );
 
-      console.log("newInterviewee", newInterviewee);
-
       await addCandidateToProject(projectId, newInterviewee._id, session);
 
       await session.commitTransaction();
@@ -187,7 +185,6 @@ router.get(
     try {
       const intervieweeId = req.params.interviewee_id;
       const { interviewee } = await getInterviewee(intervieweeId);
-      console.log("1", interviewee);
 
       return res.json({
         result: "ok",
