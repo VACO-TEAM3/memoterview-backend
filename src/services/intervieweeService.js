@@ -56,15 +56,16 @@ exports.getInterviewees = async (projectId) => {
       .findOne({ _id: projectId })
       .populate({
         path: "candidates",
-        populate: {
-          path: "comments",
-          populate: {
-            path: "commenter",
-          },
+        populate: [{
+          path: "comments.commenter",
+          model: "Interviewer",
         },
+        {
+          path: "questions",
+        }],
       }).lean();
 
-    return { candidates };
+      return { candidates }
   } catch (error) {
     return { error };
   }
@@ -116,7 +117,7 @@ exports.updateIntervieweeQuestion = async ({ projectId, intervieweeId, question 
         $push: {
           questions: newQuestion,
         },
-      }
+      }, { new: true }
     );
   } catch (error) {
     return { error };
