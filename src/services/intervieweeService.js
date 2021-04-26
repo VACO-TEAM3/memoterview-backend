@@ -1,5 +1,6 @@
 const Interviewee = require("../models/Interviewee");
 const Project = require("../models/Project");
+const Question = require("../models/Question");
 
 exports.createInterviewee = async ({ email, name, resumeUrl }) => {
   try {
@@ -49,7 +50,6 @@ exports.getInterviewee = async (intervieweeId) => {
   }
 };
 
-// 상의하기 -> 흐름, 형태 맞는지?
 exports.getInterviewees = async (projectId) => {
   try {
     const { candidates } = await Project
@@ -102,13 +102,19 @@ exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
   }
 };
 
-exports.updateIntervieweeQuestion = async ({ intervieweeId, question }) => {
+exports.updateIntervieweeQuestion = async ({ projectId, intervieweeId, question }) => {
   try {
+    const newQuestion = await Question.create({
+      ...question,
+      project: projectId,
+      interviewee: intervieweeId,
+    });
+
     await Interviewee.findByIdAndUpdate(
       intervieweeId,
       {
         $push: {
-          questions: question,
+          questions: newQuestion,
         },
       }
     );

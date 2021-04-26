@@ -1,15 +1,33 @@
 const Project = require("../models/Project");
 const Interviewer = require("../models/Interviewer");
-const { databaseURL } = require("../config");
-const Interviewee = require("../models/Interviewee");
+const Question = require("../models/Question");
 
-exports.searchQuestions = async ({ question, projectId }) => {
+exports.searchQuestions = async ({ query, projectId }) => {
   try {
+    const searchResult = await Question
+      .find({ title: { $regex: query, $options: "i" }, project: projectId } )
+      .populate("interviewer")
+      .populate("project")
+      .populate("interviewee");
+
+    const searchResultFormat = searchResult.map(searchResult => ({
+      title: searchResult.question,
+      answer: searchResult.answer,
+      score: searchResult.score,
+      interviewerName: searchResult.interviewer.username,
+      questionerAvatar: searchResult.interviewer.avatar,
+      intervieweeName: searchResult.interviewee.name,
+      interviewDate: searchResult.interviewee.createdAt,
+      intervieweeId: searchResult.interviewee._id,
+    }));
+
+    console.log(searchResultFormat, "??");
+
+    return searchResultFormat;
   } catch (error) {
     return { searchQuestionsError: error };
   }
 };
-
 
 exports.createProject = async ({ title, filters, creator, participants }) => {
   try {

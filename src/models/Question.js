@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const questionSchema = new mongoose.Schema({
-  question: {
+  title: {
     type: String,
     required: true,
   },
@@ -12,14 +12,18 @@ const questionSchema = new mongoose.Schema({
   score: {
     type: Number,
   },
-  projectId: {
+  project: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Project",
   },
-  questioner: {
+  interviewee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Interviewee",
+  },
+  interviewer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Interviewer",
   },
-}, { _id: false });
+}, { timestamps: true });
 
 module.exports = mongoose.model("Question", questionSchema);
