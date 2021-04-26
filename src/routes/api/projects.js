@@ -268,7 +268,7 @@ router.patch(
   }
 );
 
-router.post(
+router.patch(
   "/:project_id/interviewees/:interviewee_id/invite",
   validate(projectIntervieweeIdParamsSchema, "params"),
   validate(sendInvitingEmailBodySchema, "body"),
@@ -281,9 +281,27 @@ router.post(
 
     res.json({
       result: "ok",
-      mainInfo,
-      interviewee,
+      data: {
+        mainInfo,
+        interviewee,
+      },
       message: "Sent Email",
+    });
+  }
+);
+
+router.patch(
+  "/:project_id/interviewees/:interviewee_id/closeRoom",
+  validate(projectIntervieweeIdParamsSchema, "params"),
+  validate(sendInvitingEmailBodySchema, "body"),
+  async (req, res, next) => {
+    const { interviewee_id: intervieweeId } = req.params;
+
+    const interviewee = await updateInterviewRoom({ intervieweeId, isOpened: false });
+
+    res.json({
+      result: "ok",
+      data: interviewee,
     });
   }
 );
