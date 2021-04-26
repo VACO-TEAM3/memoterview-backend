@@ -3,13 +3,8 @@ const { startSession } = require("mongoose");
 const multer = require("multer");
 const util = require("util");
 const fs = require("fs");
-const nodemailer = require("nodemailer");
+
 const { getAverageScore, getFilterAvgScors } = require("../../utils/getAverageScroe");
-
-const {
-  mailing: { gmail },
-} = require("../../config");
-
 const {
   createProjectBodySchema,
   projectIdParamsSchema,
@@ -40,11 +35,10 @@ const {
   deleteInterviewee,
 } = require("../../services/intervieweeService");
 const { generateResumeUrl } = require("../../utils/generateResumeUrl");
-
 const { uploadFileToS3 } = require("../../loaders/s3");
-const mailConstant = require("../../config/inviteMailing");
-const upload = multer({ dest: "uploads/" });
+const { sendInviteEmail } = require("../../services/mailService");
 
+const upload = multer({ dest: "uploads/" });
 const router = express.Router();
 
 router.post(
@@ -100,44 +94,6 @@ router.post(
   }
 );
 
-router.patch(
-  "/:project_id", // need validation
-  validate(updateRoomStateBodySchema, "body"),
-  async (req, res, next) => {
-    try {
-      const { projectId, roomState } = req.body;
-      const {
-        project: {
-          _id,
-          creator,
-          participants,
-          title,
-          filters,
-          isOpened,
-          candidates,
-          createdAt,
-        },
-      } = await updateInterviewRoom(projectId, roomState);
-
-      return res.json({
-        result: "ok",
-        data: {
-          id: _id,
-          title,
-          filters,
-          creator,
-          isOpened,
-          participants,
-          createAt: createdAt,
-          candidateNum: candidates.length,
-        },
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-);
-
 router.get("/:project_id/interviewees", async (req, res, next) => {
   try {
     const projectId = req.params.project_id;
@@ -149,12 +105,10 @@ router.get("/:project_id/interviewees", async (req, res, next) => {
       name: interviewee.name,
       email: interviewee.email,
       interviewDate: interviewee.createdAt,
-      filterScores: interviewee.filterScores,
       isInterviewed: interviewee.isInterviewed,
-      questions: interviewee.questions,
-      comments: interviewee.comments,
       interviewDuration: interviewee.interviewDuration,
       resumePath: interviewee.resumePath,
+      isRoomOpened: interviewee.isRoomOpened,
       commentAvgScore: getAverageScore(interviewee.comments),
       questionAvgScore: getAverageScore(interviewee.questions),
       filterAvgScores: getFilterAvgScors(interviewee.filterScores),
@@ -212,6 +166,7 @@ router.post(
           isInterviewed: newInterviewee.isInterviewed,
           question: newInterviewee.question,
           resumePath: newInterviewee.resumePath,
+          isRoomOpened: newInterviewee.isRoomOpened,
         },
       });
     } catch (error) {
@@ -275,43 +230,6 @@ router.delete(
   }
 );
 
-router.patch(
-  "/:project_id/interviewees/:interviewee_id", // need validation
-  async (req, res, next) => {
-    try {
-      const { intervieweeId, interviewee } = req.body; // project Id 있음
-      const {
-        intervieweeData: {
-          _id,
-          email,
-          name,
-          resumePath,
-          questions,
-          comments,
-          isInterviewed,
-          filterScores,
-        },
-      } = await updateInterviewee({ intervieweeId, interviewee });
-
-      return res.json({
-        data: {
-          id: _id,
-          email,
-          name,
-          resumePath,
-          questions,
-          comments,
-          isInterviewed,
-          filterScores,
-        },
-        result: "ok",
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-);
-
 router.post(
   "/:project_id/interviewees/:interviewee_id/invite",
   validate(projectIntervieweeIdParamsSchema, "params"),
@@ -319,24 +237,7 @@ router.post(
   async (req, res, next) => {
     const { userEmail, welcomePageLink } = req.body;
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail", //사용하고자 하는 서비스
-      prot: 587,
-      host: "smtp.gmlail.com",
-      secure: false,
-      requireTLS: true,
-      auth: {
-        user: gmail.user, //gmail주소입력
-        pass: gmail.password, //gmail패스워드 입력
-      },
-    });
-
-    const info = await transporter.sendMail({
-      from: gmail.user, //보내는 주소 입력
-      to: userEmail, //위에서 선언해준 받는사람 이메일
-      subject: mailConstant.subject, //메일 제목
-      text: mailConstant.makeInviteMailText(welcomePageLink), //내용
-    });
+    const info = await sendInviteEmail({ welcomePageLink, userEmail });
 
     res.json({
       result: "ok",
