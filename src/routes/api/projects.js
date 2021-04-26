@@ -15,7 +15,7 @@ const {
   projectIdParamsSchema,
   updateRoomStateBodySchema,
   sendInvitingEmailBodySchema,
-  intervieweeIdParamsSchema,
+  projectIntervieweeIdParamsSchema,
 } = require("../../utils/validationSchema");
 const {
   createProject,
@@ -314,8 +314,7 @@ router.patch(
 
 router.post(
   "/:project_id/interviewees/:interviewee_id/invite",
-  // validate(projectIdParamsSchema, "params"),
-  validate(intervieweeIdParamsSchema, "params"),
+  validate(projectIntervieweeIdParamsSchema, "params"),
   validate(sendInvitingEmailBodySchema, "body"),
   async (req, res, next) => {
     const { userEmail, welcomePageLink } = req.body;
@@ -349,7 +348,7 @@ router.post(
 
 router.delete(
   "/:project_id/interviewees/:interviewee_id",
-  validate(intervieweeIdParamsSchema, "params"),
+  validate(projectIntervieweeIdParamsSchema, "params"),
   async (req, res, next) => {
     const session = await startSession();
 
