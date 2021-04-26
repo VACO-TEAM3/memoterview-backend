@@ -62,7 +62,7 @@ exports.getInterviewees = async (projectId) => {
             path: "commenter",
           },
         },
-      });
+      }).lean();
 
     return { candidates };
   } catch (error) {

@@ -102,13 +102,25 @@ router.get("/:project_id/interviewees", async (req, res, next) => {
     const { candidates } = await getInterviewees(projectId);
 
     const intervieweeList = candidates.map((interviewee) => ({
-      ...interviewee,
+      _id: interviewee._id,
       id: interviewee._id,
+      name: interviewee.name,
+      email: interviewee.email,
+      interviewDate: interviewee.interviewDate,
+      resumePath: interviewee.resumePath,
+      filterScores: interviewee.filterScores,
+      questions: interviewee.questions,
+      comments: interviewee.comments,
+      isInterviewed: interviewee.isInterviewed,
+      interviewDuration: interviewee.interviewDuration,
+      isRoomOpened: interviewee.isRoomOpened,
       questionsNum: interviewee.questions.length,
       commentAvgScore: getAverageScore(interviewee.comments),
       questionAvgScore: getAverageScore(interviewee.questions),
       filterAvgScores: getFilterAvgScors(interviewee.filterScores),
     }));
+
+    console.log(intervieweeList);
 
     return res.json({
       result: "ok",
@@ -194,8 +206,18 @@ router.get(
       return res.json({
         result: "ok",
         data: {
-          ...interviewee,
+          _id: interviewee._id,
           id: interviewee._id,
+          name: interviewee.name,
+          email: interviewee.email,
+          interviewDate: interviewee.interviewDate,
+          resumePath: interviewee.resumePath,
+          filterScores: interviewee.filterScores,
+          questions: interviewee.questions,
+          comments: interviewee.comments,
+          isInterviewed: interviewee.isInterviewed,
+          interviewDuration: interviewee.interviewDuration,
+          isRoomOpened: interviewee.isRoomOpened,
           questionsNum: interviewee.questions.length,
           commentAvgScore: getAverageScore(interviewee.comments),
           questionAvgScore: getAverageScore(interviewee.questions),
