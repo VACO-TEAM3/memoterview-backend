@@ -100,7 +100,7 @@ exports.deleteProjects = async (projectId, session) => {
 exports.updateInterviewRoom = async (projectId, isOpened) => {
   try {
     const project = await Project.findByIdAndUpdate(
-      projectId, 
+      projectId,
       { isOpened },
       { new: true }
     );
