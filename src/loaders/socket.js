@@ -16,7 +16,7 @@ module.exports = ({ app }) => {
         };
       }
 
-      if (rooms[roomID].members.length > 5) {
+      if (rooms[roomID]?.members.length > 5) {
         socket.emit("error", { message: "room is full" });
 
         return;
@@ -60,7 +60,7 @@ module.exports = ({ app }) => {
 
       const leftInterviewers = leftUsers ? leftUsers.filter((member) => !member.isInterviewee) : [];
 
-      if (leftInterviewers.length === 0) {
+      if (leftInterviewers?.length === 0) {
         updateInterviewComplete({ intervieweeId: roomID, interviewDuration });
       }
 
@@ -76,7 +76,7 @@ module.exports = ({ app }) => {
 
       delete socketToRoom[socket.id];
 
-      socket.broadcast.emit("successToLeaveOtherUser", { id: socket.id });
+      socket.to(roomID).emit("successToLeaveOtherUser", { id: socket.id });
     });
 
     socket.on("startInterview", () => {
@@ -113,6 +113,21 @@ module.exports = ({ app }) => {
       for (const otherInterviewer of otherInterviewers) {
         io.to(otherInterviewer.socketID).emit("preventButton");
       }
+
+      io.in(roomID).emit("startQuestion");
+    });
+
+    socket.on("endQuestion", () => {
+      const roomID = socketToRoom[socket.id];
+
+      if (
+        !checkRoomExists(roomID, socket) ||
+        !checkIntervieweeExists(roomID, socket)
+      ) {
+        return;
+      }
+
+      io.in(roomID).emit("endQuestion");
     });
 
     socket.on("requestAnswer", () => {
@@ -128,6 +143,7 @@ module.exports = ({ app }) => {
       const intervieweeSocketId = rooms[roomID].interviewee;
 
       io.to(intervieweeSocketId).emit("intervieweeStartAnswer");
+      io.in(roomID).emit("startAnswer");
     });
 
     socket.on("endAnswer", () => {
@@ -143,6 +159,7 @@ module.exports = ({ app }) => {
       const intervieweeSocketId = rooms[roomID].interviewee;
 
       io.to(intervieweeSocketId).emit("intervieweeEndAnswer");
+      io.in(roomID).emit("endAnswer");
     });
 
     socket.on("sendAnswer", ({ answer }) => {
@@ -186,27 +203,7 @@ module.exports = ({ app }) => {
       for (const otherInterviewer of otherInterviewers) {
         io.to(otherInterviewer.socketID).emit("enableButton");
       }
-    });
-
-    socket.on("disconnect", () => {
-      const roomID = socketToRoom[socket.id];
-      const leftUsers = rooms[roomID].members.filter(
-        (member) => member.socketID !== socket.id
-      );
-
-      if (leftUsers?.length !== 0) {
-        if (rooms[roomID]) {
-          rooms[roomID].members = leftUsers;
-        }
-      } else {
-        delete rooms[roomID];
-      }
-
-      delete users[socket.id];
-
-      delete socketToRoom[socket.id];
-
-      socket.to(roomID).emit("successToLeaveOtherUser", { id: socket.id });
+      io.in(roomID).emit("uploadComplete");
     });
   });
 
