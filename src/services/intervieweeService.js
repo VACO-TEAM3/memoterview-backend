@@ -75,8 +75,8 @@ exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
   try {
     const intervieweeData = await Interviewee.findOne({
       _id: intervieweeId,
-    }).lean();
-
+    });
+    console.log("interviewee", intervieweeData);
     Object.keys(interviewee.filterScores).forEach((key) => {
       if (!intervieweeData.filterScores[key]) {
         intervieweeData.filterScores[key] = [];
@@ -84,7 +84,8 @@ exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
 
       intervieweeData.filterScores[key].push(interviewee.filterScores[key]);
     });
-
+    console.log("interviewee", intervieweeData);
+    console.log("fetchedInterviewee", interviewee);
     const updatedInterviewee = await Interviewee.findByIdAndUpdate(
       intervieweeId,
       {

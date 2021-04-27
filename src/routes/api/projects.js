@@ -236,11 +236,8 @@ router.get(
     try {
       const query = req.query.question;
       const projectId = req.params.project_id;
-      console.log(projectId, query);
 
       const questionData = await searchQuestions({ query, projectId });
-
-      console.log(questionData, "data");
 
       return res.json({
         result: "ok",
@@ -294,7 +291,7 @@ router.patch(
     try {
       const { intervieweeId, interviewee } = req.body; // project Id 있음
       const updatedInterviewee = await updateInterviewee({ intervieweeId, interviewee });
-
+      
       return res.json({
         data: {
           _id: updatedInterviewee._id,
@@ -309,7 +306,7 @@ router.patch(
           isInterviewed: updatedInterviewee.isInterviewed,
           interviewDuration: updatedInterviewee.interviewDuration,
           isRoomOpened: updatedInterviewee.isRoomOpened,
-          questionsNum: updatedInterviewee.questions.length,
+          questionsNum: updatedInterviewee.questions?.length,
           commentAvgScore: getAverageScore(updatedInterviewee.comments),
           questionAvgScore: getAverageScore(updatedInterviewee.questions),
           filterAvgScores: getFilterAvgScors(updatedInterviewee.filterScores),
@@ -364,7 +361,7 @@ router.patch(
         isInterviewed: interviewee.isInterviewed,
         interviewDuration: interviewee.interviewDuration,
         isRoomOpened: interviewee.isRoomOpened,
-        questionsNum: interviewee.questions.length,
+        questionsNum: interviewee.questions?.length,
         commentAvgScore: getAverageScore(interviewee.comments),
         questionAvgScore: getAverageScore(interviewee.questions),
         filterAvgScores: getFilterAvgScors(interviewee.filterScores),
