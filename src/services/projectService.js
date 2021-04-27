@@ -122,6 +122,20 @@ exports.deleteProjects = async (projectId, session) => {
     return { deleteProjectsError: error };
   }
 };
+// 지워져야함
+exports.updateInterviewRoom = async (projectId, isOpened) => {
+  try {
+    const project = await Project.findByIdAndUpdate(
+      projectId,
+      { isOpened },
+      { new: true }
+    );
+
+    return { project };
+  } catch (error) {
+    return { updateInterviewRoom: error };
+  }
+};
 
 exports.updateInterviewRoom = async (projectId, isOpened) => {
   try {
