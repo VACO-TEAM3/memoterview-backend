@@ -26,7 +26,7 @@ module.exports = ({ app }) => {
         rooms[roomID].interviewee = socket.id;
         rooms[roomID].isIntervieweeJoined = true;
       }
-
+      
       rooms[roomID].members.push({ ...userData, socketID: socket.id });
       users[socket.id] = userData;
       socketToRoom[socket.id] = roomID;
@@ -36,7 +36,7 @@ module.exports = ({ app }) => {
       const targetUsers = rooms[roomID].members.filter(
         (member) => member.socketID !== socket.id
       );
-
+      
       socket.emit("joinSuccess", targetUsers);
 
       if (rooms[roomID].isIntervieweeJoined) {
@@ -44,8 +44,8 @@ module.exports = ({ app }) => {
       }
     });
 
-    socket.on("sendSignal", ({ callee, caller, signal }) => {
-      io.to(callee).emit("joinNewUser", { signal, caller });
+    socket.on("sendSignal", ({ callee, caller, signal, isInterviewee, name }) => {     
+      io.to(callee).emit("joinNewUser", { signal, caller, isInterviewee, name });
     });
 
     socket.on("returnSignal", ({ signal, caller }) => {
@@ -85,7 +85,6 @@ module.exports = ({ app }) => {
       io.in(roomID).emit("startInterview");
     });
 
-    // audio record socket logics
     socket.on("question", ({ userId }) => {
       const roomID = socketToRoom[socket.id];
 
