@@ -76,7 +76,7 @@ exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
     const intervieweeData = await Interviewee.findOne({
       _id: intervieweeId,
     });
-    console.log("interviewee", intervieweeData);
+    
     Object.keys(interviewee.filterScores).forEach((key) => {
       if (!intervieweeData.filterScores[key]) {
         intervieweeData.filterScores[key] = [];
@@ -84,8 +84,7 @@ exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
 
       intervieweeData.filterScores[key].push(interviewee.filterScores[key]);
     });
-    console.log("interviewee", intervieweeData);
-    console.log("fetchedInterviewee", interviewee);
+
     const updatedInterviewee = await Interviewee.findByIdAndUpdate(
       intervieweeId,
       {
@@ -98,6 +97,7 @@ exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
       },
       { new: true }
     );
+    
     return { intervieweeData: updatedInterviewee };
   } catch (error) {
     return { error };
@@ -118,8 +118,9 @@ exports.updateIntervieweeQuestion = async ({ projectId, intervieweeId, question 
         $push: {
           questions: newQuestion,
         },
-      }, { new: true }
-    );
+      },
+      { new: true }
+    );    
   } catch (error) {
     return { error };
   }
@@ -150,7 +151,7 @@ exports.updateInterviewComplete = async ({ intervieweeId, interviewDuration }) =
         interviewDuration,
       },
       { new: true }
-    );
+    );    
 
     return { interviewee };
   } catch (error) {
