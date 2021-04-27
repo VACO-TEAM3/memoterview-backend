@@ -4,10 +4,7 @@ module.exports = {
     browser: false,
     node: true,
   },
-  parserOptions: {
-    "ecmaVersion": 2020
-  },
-  parser: "@babel/eslint-parser",
+  "parser": "babel-eslint",
   extends: [
     "eslint:recommended",
     "plugin:node/recommended",

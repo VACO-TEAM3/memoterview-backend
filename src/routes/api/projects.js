@@ -119,8 +119,6 @@ router.get("/:project_id/interviewees", async (req, res, next) => {
       filterAvgScores: getFilterAvgScors(interviewee.filterScores),
     }));
 
-    console.log(intervieweeList);
-
     return res.json({
       result: "ok",
       data: intervieweeList,
