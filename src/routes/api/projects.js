@@ -326,11 +326,11 @@ router.post(
   async (req, res, next) => {
     const { userEmail, welcomePageLink } = req.body;
 
-    const mainInfo = await sendInviteEmail({ welcomePageLink, userEmail });
-
+    const mailInfo = await sendInviteEmail({ welcomePageLink, userEmail });
+    console.log("send mail!", mailinfo);
     res.json({
       result: "ok",
-      data: mainInfo,
+      data: mailInfo,
       message: "Sent Email",
     });
   }

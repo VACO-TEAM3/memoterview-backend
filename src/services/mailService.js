@@ -6,6 +6,7 @@ const {
 } = require("../config");
 
 exports.sendInviteEmail = async ({ welcomePageLink, userEmail }) => {
+  console.log("createTransport", welcomePageLink, userEmail);
   const transporter = nodemailer.createTransport({
     service: "gmail", //사용하고자 하는 서비스
     prot: 587,
@@ -17,7 +18,7 @@ exports.sendInviteEmail = async ({ welcomePageLink, userEmail }) => {
       pass: gmail.password, //gmail패스워드 입력
     },
   });
-
+  console.log("before sendMail", transporter);
   return await transporter.sendMail({
     from: gmail.user, //보내는 주소 입력
     to: userEmail, //위에서 선언해준 받는사람 이메일
