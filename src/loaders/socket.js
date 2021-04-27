@@ -26,7 +26,7 @@ module.exports = ({ app }) => {
         rooms[roomID].interviewee = socket.id;
         rooms[roomID].isIntervieweeJoined = true;
       }
-      
+
       rooms[roomID].members.push({ ...userData, socketID: socket.id });
       users[socket.id] = userData;
       socketToRoom[socket.id] = roomID;
@@ -36,7 +36,7 @@ module.exports = ({ app }) => {
       const targetUsers = rooms[roomID].members.filter(
         (member) => member.socketID !== socket.id
       );
-      
+
       socket.emit("joinSuccess", targetUsers);
 
       if (rooms[roomID].isIntervieweeJoined) {
@@ -44,7 +44,7 @@ module.exports = ({ app }) => {
       }
     });
 
-    socket.on("sendSignal", ({ callee, caller, signal, isInterviewee, name }) => {     
+    socket.on("sendSignal", ({ callee, caller, signal, isInterviewee, name }) => {
       io.to(callee).emit("joinNewUser", { signal, caller, isInterviewee, name });
     });
 
@@ -116,6 +116,33 @@ module.exports = ({ app }) => {
       io.in(roomID).emit("startQuestion");
     });
 
+    socket.on("onQuestionRecog", ({ transcript }) => {
+      const roomID = socketToRoom[socket.id];
+
+      if (
+        !checkRoomExists(roomID, socket) ||
+        !checkIntervieweeExists(roomID, socket)
+      ) {
+        return;
+      }
+
+      const intervieweeSocketId = rooms[roomID].interviewee;
+
+      const { questionerSocketId, questionerId } = rooms[roomID].questioner;
+
+      const interviewers = rooms[roomID].members.filter(
+        (member) =>
+          member.socketID !== intervieweeSocketId
+      );
+
+      for (const interviewer of interviewers) {
+        io.to(interviewer.socketID).emit("onQuestionRecog", {
+          questionerId,
+          transcript,
+        });
+      }
+    });
+
     socket.on("endQuestion", () => {
       const roomID = socketToRoom[socket.id];
 
@@ -143,6 +170,34 @@ module.exports = ({ app }) => {
 
       io.to(intervieweeSocketId).emit("intervieweeStartAnswer");
       io.in(roomID).emit("startAnswer");
+    });
+
+    socket.on("onAnswerRecog", ({ transcript }) => {
+      const roomID = socketToRoom[socket.id];
+
+      if (
+        !checkRoomExists(roomID, socket) ||
+        !checkIntervieweeExists(roomID, socket) ||
+        !checkQuestionerExists(roomID, socket)
+      ) {
+        return;
+      }
+
+      const intervieweeSocketId = rooms[roomID].interviewee;
+
+      const { questionerSocketId, questionerId } = rooms[roomID].questioner;
+
+      const interviewers = rooms[roomID].members.filter(
+        (member) =>
+          member.socketID !== intervieweeSocketId
+      );
+
+      for (const interviewer of interviewers) {
+        io.to(interviewer.socketID).emit("onAnswerRecog", {
+          questionerId,
+          transcript,
+        });
+      }
     });
 
     socket.on("endAnswer", () => {
