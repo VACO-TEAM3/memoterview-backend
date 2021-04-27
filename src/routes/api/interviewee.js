@@ -14,7 +14,7 @@ router.patch(
       const { projectId, intervieweeId, question } = req.body;
 
       await updateIntervieweeQuestion({ projectId, intervieweeId, question });
-
+      
       return res.json({ result: "ok" });
     } catch (error) {
       next(error);
