@@ -79,6 +79,30 @@ module.exports = ({ app }) => {
       socket.to(roomID).emit("successToLeaveOtherUser", { id: socket.id });
     });
 
+    socket.on("videoOff", () => {
+      const roomID = socketToRoom[socket.id];
+
+      socket.to(roomID).emit("someUserVideoOff", socket.id);
+    });
+
+    socket.on("videoOn", () => {
+      const roomID = socketToRoom[socket.id];
+
+      socket.to(roomID).emit("someUserVideoOn", socket.id);
+    });
+
+    socket.on("audioOff", () => {
+      const roomID = socketToRoom[socket.id];
+
+      socket.to(roomID).emit("someUserAudioOff", socket.id);
+    });
+
+    socket.on("audioOn", () => {
+      const roomID = socketToRoom[socket.id];
+
+      socket.to(roomID).emit("someUserAudioOn", socket.id);
+    });
+
     socket.on("startInterview", () => {
       const roomID = socketToRoom[socket.id];
 
