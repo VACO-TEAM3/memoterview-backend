@@ -27,13 +27,14 @@ exports.searchQuestions = async ({ query, projectId }) => {
   }
 };
 
-exports.createProject = async ({ title, filters, creator, participants }) => {
+exports.createProject = async ({ title, filters, creator, participants, category }) => {
   try {
     const newProject = await Project.create({
       title,
       filters,
       creator,
       participants,
+      category,
     }); // todo. session 넣기
 
     return { newProject };
@@ -120,20 +121,6 @@ exports.deleteProjects = async (projectId, session) => {
     return { deletedProject };
   } catch (error) {
     return { deleteProjectsError: error };
-  }
-};
-// 지워져야함
-exports.updateInterviewRoom = async (projectId, isOpened) => {
-  try {
-    const project = await Project.findByIdAndUpdate(
-      projectId,
-      { isOpened },
-      { new: true }
-    );
-
-    return { project };
-  } catch (error) {
-    return { updateInterviewRoom: error };
   }
 };
 
