@@ -11,6 +11,7 @@ exports.createProjectBodySchema = Joi.object({
   filters: Joi.array().required(),
   participants: Joi.array().required(),
   creator: Joi.string().required(),
+  category: Joi.string().allow(""),
 });
 
 exports.projectIdParamsSchema = Joi.object({
@@ -37,6 +38,7 @@ exports.intervieweeQuestionSchema = Joi.object({
     answer: Joi.string().allow(""),
     interviewer: Joi.string().required(),
     score: Joi.number().required(),
+    category: Joi.string.allow(""),
   },
 });
 
