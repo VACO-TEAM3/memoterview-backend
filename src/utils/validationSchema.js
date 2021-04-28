@@ -38,7 +38,7 @@ exports.intervieweeQuestionSchema = Joi.object({
     answer: Joi.string().allow(""),
     interviewer: Joi.string().required(),
     score: Joi.number().required(),
-    category: Joi.string.allow(""),
+    category: Joi.string().allow(""),
   },
 });
 
