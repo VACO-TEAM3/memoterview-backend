@@ -65,6 +65,7 @@ router.post(
           filters,
           candidates,
           createdAt,
+          category,
         },
       } = await createProject(project, session);
 
@@ -84,6 +85,7 @@ router.post(
           participants,
           createAt: createdAt,
           candidateNum: candidates.length,
+          category,
         },
       });
     } catch (error) {
