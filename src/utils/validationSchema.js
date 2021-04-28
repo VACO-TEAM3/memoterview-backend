@@ -42,6 +42,10 @@ exports.intervieweeQuestionSchema = Joi.object({
   },
 });
 
+exports.categorySchema = Joi.object({
+  category: Joi.string().allow(""),
+});
+
 exports.sendInvitingEmailBodySchema = Joi.object({
   userEmail: Joi.string().email().required(),
   welcomePageLink: Joi.string().required(),
