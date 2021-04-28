@@ -4,18 +4,27 @@ const router = express.Router();
 
 const { getQuestions } = require("../../services/questionService");
 
-router.get(
-  "/",
-  async (req, res, next) => {
-    try {
-      const { category } = req.body;
-      const questions = await getQuestions({ category });
+const {
+  categorySchema
+} = require("../../utils/validationSchema");
 
-      return res.json({ questions });
-      return { categorizedQuestions };
+const validate = require("../middlewares/validate");
+
+router.get(
+  "/:category",
+  validate(categorySchema, "params"),
+  async (req, res, next) => {
+    console.log(300000);
+    try {
+      const { category } = req.params;
+      
+      const questions = await getQuestions({ category });
+      console.log(questions);
+      return res.json({ data: questions });
     } catch (error) {
       next(error);
     }
   }
 );
+
 module.exports = router;
