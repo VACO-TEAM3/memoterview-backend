@@ -2,7 +2,7 @@ const Question = require("../models/Question");
 
 exports.getQuestions = async ({ category }) => {
   try {
-    const categorizedQuestions = await Question.find({ category });
+    const categorizedQuestions = await Question.find({ category }, { title: 1 });
 
     return categorizedQuestions;
   } catch (error) {
