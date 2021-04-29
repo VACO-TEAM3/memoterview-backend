@@ -58,6 +58,7 @@ router.get(
         creator: joinedProject.creator,
         candidateNum: joinedProject.candidates.length,
         createAt: joinedProject.createdAt,
+        category: joinedProject.category,
       }));
 
       return res.json({

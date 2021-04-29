@@ -6,10 +6,10 @@ exports.getQuestions = async ({ category }) => {
       [
         { $match: { category } },
         { $sample: { size: 10 } },
-        { $project: { "title": 1 } },
+        { $project: { "title": 1 } }
       ]
     );
-    console.log(categorizedQuestions);
+
     return categorizedQuestions;
   } catch (error) {
     return { getQuestionError: error };
