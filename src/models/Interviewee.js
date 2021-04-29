@@ -40,7 +40,7 @@ const intervieweeSchema = new mongoose.Schema(
     },
     questions: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Question"
+      ref: "Question",
     }],
     comments: [commentSchema],
     isInterviewed: {
@@ -48,8 +48,8 @@ const intervieweeSchema = new mongoose.Schema(
       default: false,
     },
     interviewDuration: {
-      type: String,
-      default: "0",
+      type: Number,
+      default: 0,
     },
     isRoomOpened: {
       type: Boolean,

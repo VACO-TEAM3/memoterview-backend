@@ -1,8 +1,8 @@
 function getAverageScore(scores) {
   return scores && scores.length > 0
     ? scores.reduce(
-      (acc, score) =>
-        typeof score === "object" ? acc + score.score : acc + score,
+      (acc, scoreItem) =>
+        typeof scoreItem === "object" ? acc + Number(scoreItem.score) : acc + Number(scoreItem),
       0
     ) / scores.length
     : 0;
