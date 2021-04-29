@@ -291,7 +291,7 @@ router.patch(
     try {
       const { intervieweeId, interviewee } = req.body; // project Id 있음
       const updatedInterviewee = await updateInterviewee({ intervieweeId, interviewee });
-      
+
       return res.json({
         data: {
           _id: updatedInterviewee._id,

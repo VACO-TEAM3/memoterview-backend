@@ -65,7 +65,7 @@ exports.getInterviewees = async (projectId) => {
         }],
       }).lean();
 
-      return { candidates }
+    return { candidates };
   } catch (error) {
     return { error };
   }
@@ -76,7 +76,7 @@ exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
     const intervieweeData = await Interviewee.findOne({
       _id: intervieweeId,
     });
-    
+
     Object.keys(interviewee.filterScores).forEach((key) => {
       if (!intervieweeData.filterScores[key]) {
         intervieweeData.filterScores[key] = [];
@@ -94,10 +94,11 @@ exports.updateInterviewee = async ({ intervieweeId, interviewee }) => {
         $push: {
           comments: interviewee.comments,
         },
+        interviewDuration: interviewee.interviewDuration,
       },
       { new: true }
     );
-    
+
     return { intervieweeData: updatedInterviewee };
   } catch (error) {
     return { error };
@@ -120,7 +121,7 @@ exports.updateIntervieweeQuestion = async ({ projectId, intervieweeId, question 
         },
       },
       { new: true }
-    );    
+    );
   } catch (error) {
     return { error };
   }
@@ -151,7 +152,7 @@ exports.updateInterviewComplete = async ({ intervieweeId, interviewDuration }) =
         interviewDuration,
       },
       { new: true }
-    );    
+    );
 
     return { interviewee };
   } catch (error) {

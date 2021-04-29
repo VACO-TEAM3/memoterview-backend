@@ -14,7 +14,7 @@ router.get(
   async (req, res, next) => {
     try {
       const { category } = req.params;
-      
+
       const questions = await getQuestions({ category });
 
       return res.json({ data: questions });
