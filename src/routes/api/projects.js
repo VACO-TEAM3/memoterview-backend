@@ -327,7 +327,7 @@ router.post(
     const { userEmail, welcomePageLink } = req.body;
 
     const mailInfo = await sendInviteEmail({ welcomePageLink, userEmail });
-    console.log("send mail!", mailInfo);
+
     res.json({
       result: "ok",
       data: mailInfo,
