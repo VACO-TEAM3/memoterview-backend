@@ -5,8 +5,8 @@ exports.getQuestions = async ({ category }) => {
     const categorizedQuestions = await Question.aggregate(
       [
         { $match: { category } },
-        { $sample: { size: 10 } },
-        { $project: { "title": 1 } }
+        { $sample: { size: 5 } },
+        { $project: { "title": 1 } },
       ]
     );
 
